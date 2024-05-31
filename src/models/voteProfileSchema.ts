@@ -19,5 +19,4 @@ export const fetchVoteProfile = async (userID:string) =>{
         await voteProfileData.save();
     }
     return voteProfileData;
-
 }

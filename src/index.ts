@@ -1,6 +1,7 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import { startServer } from "./models/startup";
+import { configRouter } from "./api/config";
 
 dotenv.config();
 
@@ -29,6 +30,8 @@ app.use("/api",(req:keyRequest, res:Response, next:NextFunction) =>{
     next();
 });
 
+app.use("/api/config", configRouter);
+
 app.get("/", (req:Request, res:Response) =>{
     res.json({service:"OK"})
 });
@@ -39,9 +42,8 @@ app.listen(PORT, async () =>{
     console.log(`[server]: Server and datamodel is running at http://localhost:${PORT}`);
 });
 
-function error(status:number, msg:string){
+export function error(status:number, msg:string){
     let err = new Error(msg) as Error
     err.status = status; 
     return err;
 }
-
