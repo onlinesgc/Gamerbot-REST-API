@@ -25,18 +25,27 @@ const configSchema = new Schema({
 		type: String,							// level up to level 20 or
 		required: false,						// leave the server with a specific role
 		default: "",
-	}
+	},
+    extraObjects: {type: Map, default: {}}
 });
 
 export const configModel = model("ConfigModel",configSchema);
 
-export const fetchConfig = async (id: string) => {
+/**
+ * gets the config data
+ * @param id id of the config you want to fetch
+ * @returns 
+ */
+export const fetch_config = async (id: string) => {
     let configData = await configModel.findOne({ id: id });
     if(!configData) return null;
     return configData;
 }
-
-export const createConfig = async (id: string) =>{
+/**
+ * creates a new config
+ * @param id config id
+ */
+export const create_config = async (id: string) =>{
     let configData = await configModel.create({
         id:id,
         username: "GamerBot3.0",
@@ -44,5 +53,4 @@ export const createConfig = async (id: string) =>{
         activityType: "playing"
     });
     await configData.save();
-    return true;
 }

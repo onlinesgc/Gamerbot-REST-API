@@ -1,7 +1,9 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import { start_mongo_connection } from "./models/startup";
-import { configRouter } from "./api/config";
+import { config_router } from "./api/config";
+import { guild_router } from "./api/guild";
+import { user_router } from "./api/user";
 
 //setup environment variables
 dotenv.config();
@@ -30,7 +32,9 @@ app.use("/api",(req:keyRequest, res:Response, next:NextFunction) =>{
 });
 
 //routers
-app.use("/api/config", configRouter);
+app.use("/api/config", config_router);
+app.use("/api/guild", guild_router);
+app.use("/api/user", user_router);
 
 app.get("/", (req:Request, res:Response) =>{
     res.json({service:"OK"})

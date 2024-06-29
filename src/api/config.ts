@@ -1,5 +1,5 @@
 import {Router, Response, Request, NextFunction, json} from "express"
-import { fetchConfig } from "../models/configSchema";
+import { fetch_config } from "../models/config_schema";
 
 var config_router = Router();
 config_router.use(json());
@@ -7,7 +7,7 @@ config_router.use(json());
 //GET /api/config/:configid
 //Returns the configuration data for the given configid
 config_router.get("/:configid", async (req:Request,res:Response, next:NextFunction) =>{
-    let config_data = await fetchConfig(req.params["configid"]);
+    let config_data = await fetch_config(req.params["configid"]);
     if(config_data == null) return res.status(400).json({"error":"No data with that ID"});
 
     res.json(config_data?.toJSON());
@@ -17,13 +17,44 @@ config_router.get("/:configid", async (req:Request,res:Response, next:NextFuncti
 //Updates the configuration data for the given configid
 config_router.post("/:configid", async (req:Request, res:Response, next:NextFunction) =>{
     let json_body = req.body;
-    let config_data = await fetchConfig(req.params['configid']);
+    let config_data = await fetch_config(req.params['configid']);
     for(let key in json_body){
         if(config_data?.get(key) == null) 
             return res.status(400).json({"error":`no ${key} key was found in the config`});
         config_data.set(key,json_body[key]);
     }
-    res.json(config_data);
+    res.json({"message":"Updated config"});
+    config_data?.save();
 });
 
-export { config_router as configRouter }
+
+//POST /api/config/:configid/add_obj
+//Adds an object to the extraObjects map in the configuration data for the given configid
+config_router.post("/:configid/add_obj", async (req:Request, res:Response) =>{
+    let json_body = req.body;
+    let config_data = await fetch_config(req.params['configid']);
+
+    if(json_body.value == null || json_body.key == null) 
+        return res.status(400).json({"error":"No value key in body"});
+
+    config_data?.extraObjects.set(json_body.key,json_body.value);
+    config_data?.save();
+    res.json(config_data?.toJSON());
+})
+
+
+//DELETE /api/config/:configid/remove_obj
+//Removes an object from the extraObjects map in the configuration data for the given configid
+config_router.delete("/:configid/remove_obj", async (req:Request, res:Response) =>{
+    let json_body = req.body;
+    let config_data = await fetch_config(req.params['configid']);
+
+    if(json_body.key == null) 
+        return res.status(400).json({"error":"No key key in body"});
+
+    config_data?.extraObjects.delete(json_body.key);
+    config_data?.save();
+    res.json(config_data?.toJSON());
+})
+
+export { config_router }
