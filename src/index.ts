@@ -4,6 +4,7 @@ import { start_mongo_connection } from "./models/startup";
 import { config_router } from "./api/config";
 import { guild_router } from "./api/guild";
 import { user_router } from "./api/user";
+import { public_user_router } from "./public_api/user";
 
 //setup environment variables
 dotenv.config();
@@ -35,6 +36,9 @@ app.use("/api",(req:keyRequest, res:Response, next:NextFunction) =>{
 app.use("/api/config", config_router);
 app.use("/api/guild", guild_router);
 app.use("/api/user", user_router);
+
+//public api
+app.use("/public_api/user", public_user_router);
 
 app.get("/", (req:Request, res:Response) =>{
     res.json({service:"OK"})
