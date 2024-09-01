@@ -1,4 +1,4 @@
-import { Request, Response, Router, json } from "express";
+import { Request, Response, Router } from "express";
 import { fetch_user } from "../models/user_schema";
 
 var public_user_router = Router();

@@ -1,5 +1,6 @@
 import {Router, Response, Request, NextFunction, json} from "express"
 import { fetch_config } from "../models/config_schema";
+import { createTokenLog } from "../models/token_log_schema";
 
 var config_router = Router();
 config_router.use(json());
@@ -7,6 +8,7 @@ config_router.use(json());
 //GET /api/config/:configid
 //Returns the configuration data for the given configid
 config_router.get("/:configid", async (req:Request,res:Response, next:NextFunction) =>{
+    createTokenLog(req.headers['authorization'],"GET /api/config/:configid",new Date(),{configid:req.params["configid"]});
     let config_data = await fetch_config(req.params["configid"]);
     if(config_data == null) return res.status(400).json({"error":"No data with that ID"});
 
@@ -17,6 +19,7 @@ config_router.get("/:configid", async (req:Request,res:Response, next:NextFuncti
 //Updates the configuration data for the given configid
 config_router.post("/:configid", async (req:Request, res:Response, next:NextFunction) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"POST /api/config/:configid",new Date(),{configid:req.params["configid"],body:json_body});
     let config_data = await fetch_config(req.params['configid']);
     for(let key in json_body){
         if(config_data?.get(key) == null) 
@@ -32,6 +35,7 @@ config_router.post("/:configid", async (req:Request, res:Response, next:NextFunc
 //Adds an object to the extraObjects map in the configuration data for the given configid
 config_router.post("/:configid/add_obj", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"POST /api/config/:configid/add_obj",new Date(),{configid:req.params["configid"],body:json_body});
     let config_data = await fetch_config(req.params['configid']);
 
     if(json_body.value == null || json_body.key == null) 
@@ -47,6 +51,7 @@ config_router.post("/:configid/add_obj", async (req:Request, res:Response) =>{
 //Removes an object from the extraObjects map in the configuration data for the given configid
 config_router.delete("/:configid/remove_obj", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"DELETE /api/config/:configid/remove_obj",new Date(),{configid:req.params["configid"],body:json_body});
     let config_data = await fetch_config(req.params['configid']);
 
     if(json_body.key == null) 

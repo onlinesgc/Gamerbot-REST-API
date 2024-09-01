@@ -5,6 +5,7 @@ import { config_router } from "./api/config";
 import { guild_router } from "./api/guild";
 import { user_router } from "./api/user";
 import { public_user_router } from "./public_api/user";
+import { fetchTokenProfileByToken } from "./models/token_schema";
 
 //setup environment variables
 dotenv.config();
@@ -12,21 +13,18 @@ dotenv.config();
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
-var temp_api_keys = ['test']; //DEBUG Move to database
-
 //Interfaces for classes
 interface keyRequest extends Request{
     key?:string
 }
 
 //Middleware for API keys
-app.use("/api",(req:keyRequest, res:Response, next:NextFunction) =>{
+app.use("/api",async (req:keyRequest, res:Response, next:NextFunction) =>{
     let headers = req.headers['authorization'];
     if(!headers) return res.status(401).json({"error":"No API token"})
 
     let key = headers.split(' ')[1];
-
-    if(temp_api_keys.indexOf(key) === -1) return res.status(401).json({"error":"Wrong API token"})
+    if( await fetchTokenProfileByToken(key) == null) return res.status(401).json({"error":"Invalid API token"});
 
     req.key = key;
     next();

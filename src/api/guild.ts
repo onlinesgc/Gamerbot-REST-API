@@ -1,5 +1,6 @@
 import { Router, json , Request, Response} from "express";
 import { create_guild_config, fetch_guild_config } from "../models/guild_schema";
+import { createTokenLog } from "../models/token_log_schema";
 
 
 var guild_router = Router();
@@ -8,6 +9,7 @@ guild_router.use(json());
 //GET /api/guild/:guildid
 //Returns the guild configuration data for the given guildid
 guild_router.get("/:guildid", async (req:Request, res:Response) => {
+    createTokenLog(req.headers['authorization'],"GET /api/guild/:guildid",new Date(),{guildid:req.params["guildid"]});
     let guild_data = await fetch_guild_config(req.params["guildid"]);
     if(guild_data == null) return res.status(400).json({"error":"No data with that ID"});
 
@@ -18,6 +20,7 @@ guild_router.get("/:guildid", async (req:Request, res:Response) => {
 //Updates the guild configuration data for the given guildid
 guild_router.post("/:guildid", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"POST /api/guild/:guildid",new Date(),{guildid:req.params["guildid"],body:json_body});
     let guild_data = await fetch_guild_config(req.params['guildid']);
     for(let key in json_body){
         if(guild_data?.get(key) == null) 
@@ -34,6 +37,7 @@ guild_router.post("/:guildid", async (req:Request, res:Response) =>{
 //Adds an object to the extraObjects map in the guild configuration data for the given guildid
 guild_router.post("/:guildid/add_obj", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"POST /api/guild/:guildid/add_obj",new Date(),{guildid:req.params["guildid"],body:json_body});
     let guild_data = await fetch_guild_config(req.params['guildid']);
 
     if(json_body.value == null || json_body.key == null) 
@@ -49,6 +53,7 @@ guild_router.post("/:guildid/add_obj", async (req:Request, res:Response) =>{
 //Removes an object from the extraObjects map in the guild configuration data for the given guildid
 guild_router.delete("/:guildid/remove_obj", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"DELETE /api/guild/:guildid/remove_obj",new Date(),{guildid:req.params["guildid"],body:json_body});
     let guild_data = await fetch_guild_config(req.params['guildid']);
 
     if(json_body.key == null) 
@@ -64,6 +69,7 @@ guild_router.delete("/:guildid/remove_obj", async (req:Request, res:Response) =>
 //Creates a new guild configuration data for the given guildid
 guild_router.post("/create", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"POST /api/guild/create",new Date(),{body:json_body});
     let guild_data = await fetch_guild_config(json_body.guildID);
     if(guild_data != null) return res.status(400).json({"error":"Guild data already exists"});
 

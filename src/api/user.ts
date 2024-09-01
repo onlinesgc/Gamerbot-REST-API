@@ -1,5 +1,6 @@
 import { Request, Response, Router, json } from "express";
 import { create_user, fetchAll, fetch_user } from "../models/user_schema";
+import { createTokenLog } from "../models/token_log_schema";
 
 var user_router = Router();
 user_router.use(json());
@@ -7,14 +8,18 @@ user_router.use(json());
 //GET /api/user/:userid
 //Returns the user data for the given userid
 user_router.get("/:userid", async (req:Request, res:Response) => {
+    createTokenLog(req.headers['authorization'],"GET /api/user/:userid",new Date(),{userid:req.params["userid"]});
     let guild_data = await fetch_user(req.params["userid"]);
     if(guild_data == null) return res.status(400).json({"error":"No data with that ID"});
 
     return res.json(guild_data.toJSON());
 });
 
-user_router.post("/fetch_many", async (req:Request, res:Response) => {
+//GET /api/user/fetch_many
+//Returns the user data for the given filter
+user_router.get("/fetch_many", async (req:Request, res:Response) => {
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"GET /api/user/fetch_many",new Date(),{filter:json_body.filter});
     if(json_body.filter == null) return res.status(400).json({"error":"No filter key in body"});
     let users = (json_body.maxUsers == null) ? await fetchAll(json_body.filter) : await fetchAll(json_body.filter, json_body.maxUsers);
     res.json(users);
@@ -24,6 +29,7 @@ user_router.post("/fetch_many", async (req:Request, res:Response) => {
 //Updates the user data for the given userid
 user_router.post("/:userid", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"POST /api/user/:userid",new Date(),{userid:req.params["userid"],body:json_body});
     let user_data = await fetch_user(req.params['userid']);
     for(let key in json_body){
         if(user_data?.get(key) == null) 
@@ -39,8 +45,8 @@ user_router.post("/:userid", async (req:Request, res:Response) =>{
 //Adds an object to the extraObjects map in the user data for the given userid
 user_router.post("/:userid/add_obj", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"POST /api/user/:userid/add_obj",new Date(),{userid:req.params["userid"],body:json_body});
     let user_data = await fetch_user(req.params['userid']);
-
     if(json_body.value == null || json_body.key == null) 
         return res.status(400).json({"error":"No value key in body"});
 
@@ -54,6 +60,7 @@ user_router.post("/:userid/add_obj", async (req:Request, res:Response) =>{
 //Removes an object from the extraObjects map in the user data for the given userid
 user_router.delete("/:userid/remove_obj", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"DELETE /api/user/:userid/remove_obj",new Date(),{userid:req.params["userid"],body:json_body});
     let user_data = await fetch_user(req.params['userid']);
 
     if(json_body.key == null) 
@@ -69,6 +76,7 @@ user_router.delete("/:userid/remove_obj", async (req:Request, res:Response) =>{
 //Creates a new user
 user_router.post("/create", async (req:Request, res:Response) =>{
     let json_body = req.body;
+    createTokenLog(req.headers['authorization'],"POST /api/user/create",new Date(),{body:json_body});
     let guild_data = await fetch_user(json_body.userID);
     if(guild_data != null) return res.status(400).json({"error":"User already exists"});
 
