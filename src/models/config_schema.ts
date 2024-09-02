@@ -3,6 +3,7 @@ import {Schema, model} from "mongoose";
 const configSchema = new Schema({
     id: {type:Number, default:0},
     debug: {type:Boolean, default:false},
+    debugGuildID: {type:String},
     username: {type: String},
     activity: { type: String },
 	activityType: { type: String },
