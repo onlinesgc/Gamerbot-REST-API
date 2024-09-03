@@ -19,29 +19,33 @@ export async function generateFrame(name:string,frame:number,hex_color:string,le
     const whidth = 500;
     const height = 800;
 
-    registerFont("graphics/fonts/Sansumu02-Regular.ttf", { family: "Sansumu" });
+    //INFO: Don't work on windows
+    registerFont(path.resolve("./")+"/graphics/fonts/Sansumu02-Regular.ttf", { family: "Sansumu 02" });
+
     const canvas = createCanvas(whidth, height);
     const ctx = canvas.getContext('2d');
+
 
     //background color
     ctx.fillStyle = hex_color;
     ctx.fillRect(0, 0, whidth, height);
     //Loads frame
-    await loadImage(frame_path, (img:Image) => ctx.drawImage(img, 0, 0, whidth, height));
+    console.log(frame_path);
+    await loadImage(frame_path).then((img:Image) => ctx.drawImage(img, 0, 0, whidth, height));
 
     //loads avatar
     if(member_avatar_url != null){
-        await loadImage(member_avatar_url, (img:Image) =>ctx.drawImage(img, 0, 0, whidth, height));
+        await loadImage(member_avatar_url).then((img:Image) => ctx.drawImage(img, 0, 0, whidth, height));
     }
 
     //writes name
-    ctx.font = "bold 50pt Sansumu";
+    ctx.font = "50pt Sansumu 02";
     ctx.textAlign = "center";
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText(name, whidth/2, 400);
 
     //writes level
-    ctx.font = "normal 40pt Sansumu";
+    ctx.font = "40pt Sansumu 02";
     ctx.fillText(`Level: ${level}`, whidth/2, 470);
 
     //renders xp bar
@@ -54,12 +58,12 @@ export async function generateFrame(name:string,frame:number,hex_color:string,le
     roundRect(ctx, 65, 500, bar, 40, 20, true, false);
 
     //writes xp amount
-    ctx.font = "normal 40pt Sansumu";
+    ctx.font = "40pt Sansumu 02";
     ctx.fillText(`${xpPercentage}%`, (whidth / 2), 600);
 
     //loads foreground frame if there is one
     if(foreground_frame_path != null){
-        await loadImage(foreground_frame_path, (img:Image) => ctx.drawImage(img, 0, 0, whidth, height));
+        await loadImage(foreground_frame_path).then((img:Image) => ctx.drawImage(img, 0, 0, whidth, height));
     }
     
     //returns the image
