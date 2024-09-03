@@ -35,7 +35,7 @@ export async function generateFrame(name:string,frame:number,hex_color:string,le
 
     //loads avatar
     if(member_avatar_url != null){
-        await loadImage(member_avatar_url).then((img:Image) => ctx.drawImage(img, 0, 0, whidth, height));
+        await loadImage(member_avatar_url).then((img:Image) => ctx.drawImage(img, (whidth / 2) - 125, 80, 250, 250));
     }
 
     //writes name
