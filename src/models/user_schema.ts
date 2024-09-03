@@ -28,6 +28,7 @@ const user_schema = new Schema({
 	minecraftUuid:{type:String},
 	minecraftSecretCode:{type:String},
 	old_messages:{type:Array},
+	cachedImageLink:{type:String},
 	extraObjects: {type: Map, default: {}}
 });
 

@@ -6,6 +6,7 @@ import { guild_router } from "./api/guild";
 import { user_router } from "./api/user";
 import { public_user_router } from "./public_api/user";
 import { fetchTokenProfileByToken } from "./models/token_schema";
+import { rateLimit } from "express-rate-limit";
 
 //setup environment variables
 dotenv.config();
@@ -29,6 +30,14 @@ app.use("/api",async (req:keyRequest, res:Response, next:NextFunction) =>{
     req.key = key;
     next();
 });
+
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: "draft-7",
+    legacyHeaders:false,
+    skip: async (req:keyRequest) =>  await fetchTokenProfileByToken(req.headers['authorization']?.split(' ')[1] as string) != null //skip if the token is valid, otherwise apply rate limit to the ta;
+}));
 
 //routers
 app.use("/api/config", config_router);

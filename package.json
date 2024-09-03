@@ -21,8 +21,10 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "canvas": "^2.11.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
     "mongoose": "^8.4.0"
   }
 }

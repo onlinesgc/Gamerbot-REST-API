@@ -10,6 +10,7 @@ const configSchema = new Schema({
     removeLinks: {type:Boolean, default:false},
     NotisSystemOn: {type:Boolean, default:false},
     notifcationReloadTime: {type:Number},
+    cacheQueue: {type:Array<String>},
     NotisChannels: {type: Array, default: {		// Channels where stream/video-notifications are sent
 		id:"UCOZr_fd45CDuyqQEPQZaqMA",
 		Notis:true
@@ -39,7 +40,7 @@ export const configModel = model("ConfigModel",configSchema);
  */
 export const fetch_config = async (id: string) => {
     let configData = await configModel.findOne({ id: id });
-    if(!configData) return null;
+    if(!configData) return await create_config(id);
     return configData;
 }
 /**
@@ -54,4 +55,5 @@ export const create_config = async (id: string) =>{
         activityType: "playing"
     });
     await configData.save();
+    return configData;
 }

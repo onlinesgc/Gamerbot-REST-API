@@ -18,6 +18,12 @@ const guild_config_schema = new Schema({
     topicList: {type:Array},
     staffModlogs: {type:String},
     sverokMails: {type:Array},
+    frameConfig: {type: Array<Object>, default: [{
+        name: "Default",
+        frameLink:"",
+        path:"",
+        id:0
+    }]},
     extraObjects: {type: Map, default: {}}
 });
 
