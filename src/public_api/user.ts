@@ -49,7 +49,7 @@ public_user_router.post("/frame", async (req:Request, res:Response) =>{
         fs.mkdirSync(cache_path);
     }
 
-    if(!fs.existsSync(`${cache_path}/${json_body.userid}.png`) || (json_body.force != null && json_body.force == true)){
+    if(!fs.existsSync(`${cache_path}/${json_body.userid}.png`) || json_body?.force == true){
         let photo = await generateFrame(json_body.username, json_body.frame_id, json_body.hex_color, json_body.level, json_body.xp_percentage,member_avatar_url);
         if(photo == null) return res.status(500).json({"error":"Error generating photo"});
         const fiels = fs.readdirSync(cache_path);
