@@ -15,29 +15,35 @@ const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
 //Interfaces for classes
-interface keyRequest extends Request{
-    key?:string
+interface keyRequest extends Request {
+  key?: string;
 }
 
 //Middleware for API keys
-app.use("/api",async (req:keyRequest, res:Response, next:NextFunction) =>{
-    let headers = req.headers['authorization'];
-    if(!headers) return res.status(401).json({"error":"No API token"})
+app.use("/api", async (req: keyRequest, res: Response, next: NextFunction) => {
+  const headers = req.headers["authorization"];
+  if (!headers) return res.status(401).json({ error: "No API token" });
 
-    let key = headers.split(' ')[1];
-    if( await fetchTokenProfileByToken(key) == null) return res.status(401).json({"error":"Invalid API token"});
+  const key = headers.split(" ")[1];
+  if ((await fetchTokenProfileByToken(key)) == null)
+    return res.status(401).json({ error: "Invalid API token" });
 
-    req.key = key;
-    next();
+  req.key = key;
+  next();
 });
 
-app.use(rateLimit({
+app.use(
+  rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
     standardHeaders: "draft-7",
-    legacyHeaders:false,
-    skip: async (req:keyRequest) =>  await fetchTokenProfileByToken(req.headers['authorization']?.split(' ')[1] as string) != null //skip if the token is valid, otherwise apply rate limit to the ta;
-}));
+    legacyHeaders: false,
+    skip: async (req: keyRequest) =>
+      (await fetchTokenProfileByToken(
+        req.headers["authorization"]?.split(" ")[1] as string,
+      )) != null, //skip if the token is valid, otherwise apply rate limit to the ta;
+  }),
+);
 
 //routers
 app.use("/api/config", config_router);
@@ -47,11 +53,13 @@ app.use("/api/user", user_router);
 //public api
 app.use("/public_api/user", public_user_router);
 
-app.get("/", (req:Request, res:Response) =>{
-    res.json({service:"OK"})
+app.get("/", (req: Request, res: Response) => {
+  res.json({ service: "OK" });
 });
 
-app.listen(PORT, async () =>{
-    await start_mongo_connection();
-    console.log(`[server]: Server and datamodel is running at http://localhost:${PORT}`);
+app.listen(PORT, async () => {
+  await start_mongo_connection();
+  console.log(
+    `[server]: Server and datamodel is running at http://localhost:${PORT}`,
+  );
 });
