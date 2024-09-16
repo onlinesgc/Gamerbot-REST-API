@@ -49,8 +49,13 @@ public_user_router.post("/frame", async (req: Request, res: Response) => {
     json_body.avatar_url != null ? json_body.avatar_url : null;
 
   const cache_path = path.resolve("./") + "/cache";
+
   if (!fs.existsSync(cache_path)) {
     fs.mkdirSync(cache_path);
+  }
+
+  if(!fs.realpathSync(`${cache_path}/${json_body.userid}.png`).startsWith(cache_path)) {
+    return res.status(400).json({ error: "Invalid path" });
   }
 
   if (
