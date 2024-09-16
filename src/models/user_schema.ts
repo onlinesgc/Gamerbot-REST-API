@@ -47,7 +47,7 @@ const user_model = model("ProfileModels", user_schema);
  * @returns user profile
  */
 const fetch_user = async (user_ID: string) => {
-  const profileData = await user_model.findOne({ userID: user_ID });
+  const profileData = await user_model.findOne({ userID: { $eq: user_ID } });
   if (!profileData) return null;
   return profileData;
 };

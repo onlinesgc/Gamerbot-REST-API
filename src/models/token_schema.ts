@@ -14,7 +14,7 @@ const token_model = model("tokenModel", token_profile_schema);
  * @returns token profile
  */
 export const fetchTokenProfile = async (id: number) => {
-  const tokenData = await token_model.findOne({ token_id: id });
+  const tokenData = await token_model.findOne({ token_id: { $eq: id} });
   if (!tokenData) return null;
   else return tokenData;
 };
@@ -25,7 +25,7 @@ export const fetchTokenProfile = async (id: number) => {
  * @returns token profile
  */
 export const fetchTokenProfileByToken = async (token: string) => {
-  const tokenData = await token_model.findOne({ token: token });
+  const tokenData = await token_model.findOne({ token: { $eq: token } });
   if (!tokenData) return null;
   else return tokenData;
 };

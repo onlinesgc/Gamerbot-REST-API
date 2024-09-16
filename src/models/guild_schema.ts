@@ -40,7 +40,7 @@ const guild_model = model("GuildConfig", guild_config_schema);
  * @returns
  */
 const fetch_guild_config = async (guild_ID: string) => {
-  const data = await guild_model.findOne({ guildID: guild_ID });
+  const data = await guild_model.findOne({ guildID:{ $eq: guild_ID }});
   if (data == null) return null;
   return data;
 };

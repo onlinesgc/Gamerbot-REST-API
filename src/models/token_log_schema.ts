@@ -16,7 +16,7 @@ const token_log_model = model("tokenLogModel", token_log_profile_schema);
  * @returns token profile
  */
 export const fetchTokenLogProfile = async (id: string) => {
-  const tokenLogData = await token_log_model.findOne({ token_id: id });
+  const tokenLogData = await token_log_model.findOne({ token_id: { $eq: id }});
   if (!tokenLogData) return null;
   else return tokenLogData;
 };

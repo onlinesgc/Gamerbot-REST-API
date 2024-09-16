@@ -47,7 +47,7 @@ export const configModel = model("ConfigModel", configSchema);
  * @returns
  */
 export const fetch_config = async (id: string) => {
-  const configData = await configModel.findOne({ id: id });
+  const configData = await configModel.findOne({ id: { $eq: id } });
   if (!configData) return await create_config(id);
   return configData;
 };
