@@ -48,18 +48,14 @@ public_user_router.post("/frame", async (req: Request, res: Response) => {
   const member_avatar_url =
     json_body.avatar_url != null ? json_body.avatar_url : null;
 
-  const cache_path = path.resolve("./") + "/cache";
+  const cache_path = path.resolve("./cache");
 
   if (!fs.existsSync(cache_path)) {
     fs.mkdirSync(cache_path);
   }
 
-  if(!fs.realpathSync(`${cache_path}/${json_body.userid}.png`).startsWith(cache_path)) {
-    return res.status(400).json({ error: "Invalid path" });
-  }
-
   if (
-    !fs.existsSync(`${cache_path}/${json_body.userid}.png`) ||
+    !(config.cacheQueue as unknown as Array<string>).includes(json_body.userid) ||
     json_body?.force == true
   ) {
     const photo = await generateFrame(
@@ -85,6 +81,11 @@ public_user_router.post("/frame", async (req: Request, res: Response) => {
     )
       (config.cacheQueue as unknown as Array<string>).push(json_body.userid);
     config.save();
+  }else{
+    const check_file = fs.realpathSync(path.resolve(cache_path, json_body.userid + ".png"));
+    if(!check_file.startsWith(cache_path)) {
+      return res.status(400).json({ error: "Invalid path" });
+    }
   }
   res.sendFile(`${cache_path}/${json_body.userid}.png`);
 });
