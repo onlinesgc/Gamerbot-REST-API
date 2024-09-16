@@ -73,6 +73,9 @@ public_user_router.post("/frame", async (req: Request, res: Response) => {
       const id = (config.cacheQueue as unknown as Array<string>).shift();
       fs.rmSync(`${cache_path}/${id}.png`);
     }
+    if(!checkPath(cache_path, json_body.userid)){
+      return res.status(400).json({ error: "Invalid path" });
+    }
     await writeFile(`${cache_path}/${json_body.userid}.png`, photo);
     if (
       !(config.cacheQueue as unknown as Array<string>).includes(
@@ -82,13 +85,22 @@ public_user_router.post("/frame", async (req: Request, res: Response) => {
       (config.cacheQueue as unknown as Array<string>).push(json_body.userid);
     config.save();
   }else{
-    const check_file = fs.realpathSync(path.resolve(cache_path, json_body.userid + ".png"));
-    if(!check_file.startsWith(cache_path)) {
+    if(!checkPath(cache_path, json_body.userid)){
       return res.status(400).json({ error: "Invalid path" });
     }
   }
   res.sendFile(`${cache_path}/${json_body.userid}.png`);
 });
+
+function checkPath(cache_path:string, userid:string){
+  const check_file = fs.realpathSync(path.resolve(cache_path, userid + ".png"));
+  if(!check_file.startsWith(cache_path)) {
+    return false;
+  }
+  else{
+    return true;
+  }
+}
 
 function writeFile(path: string, data: Buffer) {
   return new Promise((resolve, reject) => {
