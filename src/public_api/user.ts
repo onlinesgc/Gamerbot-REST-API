@@ -4,6 +4,8 @@ import fs from "fs";
 import { generateFrame } from "../functions/generateFrame";
 import { fetch_config } from "../models/config_schema";
 import path from "path";
+import sanitize from "sanitize-filename";
+import { buffer } from "stream/consumers";
 
 const public_user_router = Router();
 public_user_router.use(json());
@@ -54,8 +56,10 @@ public_user_router.post("/frame", async (req: Request, res: Response) => {
     fs.mkdirSync(cache_path);
   }
 
+  const user_id = sanitize(json_body.userid);
+
   if (
-    !(config.cacheQueue as unknown as Array<string>).includes(json_body.userid) ||
+    !(config.cacheQueue as unknown as Array<string>).includes(user_id) ||
     json_body?.force == true
   ) {
     const photo = await generateFrame(
@@ -73,27 +77,24 @@ public_user_router.post("/frame", async (req: Request, res: Response) => {
       const id = (config.cacheQueue as unknown as Array<string>).shift();
       fs.rmSync(`${cache_path}/${id}.png`);
     }
-    const check_file = fs.realpathSync(path.resolve(cache_path, json_body.userid + ".png"));
-    if(!check_file.startsWith(cache_path)) {
-      return res.status(400).json({ error: "Invalid path" });
-    }
-    
-    fs.writeFileSync(`${cache_path}/${json_body.userid}.png`, photo);
+
+    fs.writeFileSync(`${cache_path}/${user_id}.png`, photo);
 
     if (
       !(config.cacheQueue as unknown as Array<string>).includes(
-        json_body.userid,
+        user_id,
       )
     )
-      (config.cacheQueue as unknown as Array<string>).push(json_body.userid);
+      (config.cacheQueue as unknown as Array<string>).push(user_id);
     config.save();
   }else{
-    const check_file = fs.realpathSync(path.resolve(cache_path, json_body.userid + ".png"));
+    const check_file = fs.realpathSync(path.resolve(cache_path, user_id + ".png"));
     if(!check_file.startsWith(cache_path)) {
       return res.status(400).json({ error: "Invalid path" });
     }
   }
   res.sendFile(`${cache_path}/${json_body.userid}.png`);
 });
+
 
 export { public_user_router };
