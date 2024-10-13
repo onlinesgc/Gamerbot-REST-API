@@ -6,7 +6,8 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "hashToken": "node -e \"require('dotenv').config(); const readline = require('node:readline'); const rl = readline.createInterface({ input: process.stdin, output: process.stdout}); rl.question('Write the token you want to hash', name => {console.log(require('crypto').createHmac('sha256', process.env.HASH_SECRET).update(name).digest('hex'));})\""
   },
   "keywords": [],
   "author": "",

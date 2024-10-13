@@ -7,9 +7,12 @@ import { user_router } from "./api/user";
 import { public_user_router } from "./public_api/user";
 import { fetchTokenProfileByToken } from "./models/token_schema";
 import { rateLimit } from "express-rate-limit";
+import Crypto from "crypto"; 
 
 //setup environment variables
 dotenv.config();
+const hash = Crypto.createHmac("sha256", process.env.HASH_SECRET as string);
+
 
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
@@ -25,7 +28,7 @@ app.use("/api", async (req: keyRequest, res: Response, next: NextFunction) => {
   if (!headers) return res.status(401).json({ error: "No API token" });
 
   const key = headers.split(" ")[1];
-  if ((await fetchTokenProfileByToken(key)) == null)
+  if ((await fetchTokenProfileByToken(hash.up)) == null)
     return res.status(401).json({ error: "Invalid API token" });
 
   req.key = key;
@@ -38,9 +41,9 @@ app.use(
     max: 100,
     standardHeaders: "draft-7",
     legacyHeaders: false,
-    skip: async (req: keyRequest) =>
+    skip: async () =>
       (await fetchTokenProfileByToken(
-        req.headers["authorization"]?.split(" ")[1] as string,
+        hash.digest('hex'),
       )) != null, //skip if the token is valid, otherwise apply rate limit to the ta;
   }),
 );

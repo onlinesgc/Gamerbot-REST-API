@@ -5,7 +5,6 @@ import { generateFrame } from "../functions/generateFrame";
 import { fetch_config } from "../models/config_schema";
 import path from "path";
 import sanitize from "sanitize-filename";
-import { buffer } from "stream/consumers";
 
 const public_user_router = Router();
 public_user_router.use(json());
