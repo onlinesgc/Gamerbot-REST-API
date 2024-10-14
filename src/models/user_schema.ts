@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose'
 
 const user_schema = new Schema({
     userID: { type: String, require: true, unique: true },
@@ -9,8 +9,8 @@ const user_schema = new Schema({
     level: { type: Number },
     reminders: { type: Array },
     colorHexCode: { type: String },
-    privateVoiceID: { type: String, default: "" },
-    privateVoiceThreadID: { type: String, default: "" },
+    privateVoiceID: { type: String, default: '' },
+    privateVoiceThreadID: { type: String, default: '' },
     profileFrame: { type: String },
     hasLeftTicket: { type: Boolean },
     xpboost: {
@@ -37,9 +37,9 @@ const user_schema = new Schema({
     old_messages: { type: Array },
     cachedImageLink: { type: String },
     extraObjects: { type: Map, default: {} },
-});
+})
 
-const user_model = model("ProfileModels", user_schema);
+const user_model = model('ProfileModels', user_schema)
 
 /**
  * Fetch user
@@ -47,10 +47,10 @@ const user_model = model("ProfileModels", user_schema);
  * @returns user profile
  */
 const fetch_user = async (user_ID: string) => {
-    const profileData = await user_model.findOne({ userID: { $eq: user_ID } });
-    if (!profileData) return null;
-    return profileData;
-};
+    const profileData = await user_model.findOne({ userID: { $eq: user_ID } })
+    if (!profileData) return null
+    return profileData
+}
 
 /**
  * Create user
@@ -66,7 +66,7 @@ const create_user = async (
     server_ID: string,
     last_message_timestamp: number = 0,
     xp_timeout_until: number = 0,
-    color_hex_code = "#787C75",
+    color_hex_code = '#787C75',
     profile_frame = 0,
 ) => {
     const profileData = await user_model.create({
@@ -83,10 +83,10 @@ const create_user = async (
         minecraftUsername: null,
         minecraftUuid: null,
         minecraftSecretCode: null,
-    });
-    await profileData.save();
-    return profileData;
-};
+    })
+    await profileData.save()
+    return profileData
+}
 /**
  * fetch all users with filter
  * @param filter
@@ -94,7 +94,7 @@ const create_user = async (
  * @returns
  */
 const fetchAll = async (filter: object, maxUsers = -1) => {
-    filter = filter || {};
+    filter = filter || {}
     const profiles =
         maxUsers != -1
             ? user_model
@@ -102,8 +102,8 @@ const fetchAll = async (filter: object, maxUsers = -1) => {
                   .sort({ level: -1 })
                   .sort({ xp: -1 })
                   .limit(maxUsers)
-            : user_model.find(filter).sort({ level: -1 }).sort({ xp: -1 });
-    return profiles;
-};
+            : user_model.find(filter).sort({ level: -1 }).sort({ xp: -1 })
+    return profiles
+}
 
-export { user_model, fetch_user, create_user, fetchAll };
+export { user_model, fetch_user, create_user, fetchAll }

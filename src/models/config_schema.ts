@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose'
 
 const configSchema = new Schema({
     id: { type: Number, default: 0 },
@@ -15,7 +15,7 @@ const configSchema = new Schema({
         type: Array,
         default: {
             // Channels where stream/video-notifications are sent
-            id: "UCOZr_fd45CDuyqQEPQZaqMA",
+            id: 'UCOZr_fd45CDuyqQEPQZaqMA',
             Notis: true,
         },
     },
@@ -34,12 +34,12 @@ const configSchema = new Schema({
         // Channel to send updates when a member
         type: String, // level up to level 20 or
         required: false, // leave the server with a specific role
-        default: "",
+        default: '',
     },
     extraObjects: { type: Map, default: {} },
-});
+})
 
-export const configModel = model("ConfigModel", configSchema);
+export const configModel = model('ConfigModel', configSchema)
 
 /**
  * gets the config data
@@ -47,10 +47,10 @@ export const configModel = model("ConfigModel", configSchema);
  * @returns
  */
 export const fetch_config = async (id: string) => {
-    const configData = await configModel.findOne({ id: { $eq: id } });
-    if (!configData) return await create_config(id);
-    return configData;
-};
+    const configData = await configModel.findOne({ id: { $eq: id } })
+    if (!configData) return await create_config(id)
+    return configData
+}
 /**
  * creates a new config
  * @param id config id
@@ -58,10 +58,10 @@ export const fetch_config = async (id: string) => {
 export const create_config = async (id: string) => {
     const configData = await configModel.create({
         id: id,
-        username: "GamerBot3.0",
-        activity: "Testspel",
-        activityType: "playing",
-    });
-    await configData.save();
-    return configData;
-};
+        username: 'GamerBot3.0',
+        activity: 'Testspel',
+        activityType: 'playing',
+    })
+    await configData.save()
+    return configData
+}
