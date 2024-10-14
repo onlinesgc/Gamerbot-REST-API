@@ -7,6 +7,7 @@ import { user_router } from "./api/user";
 import { public_user_router } from "./public_api/user";
 import { fetchTokenProfileByToken } from "./models/token_schema";
 import { rateLimit } from "express-rate-limit";
+import { public_frame_router } from "./public_api/frame";
 
 //setup environment variables
 dotenv.config();
@@ -16,33 +17,33 @@ const PORT = process.env.PORT || 3000;
 
 //Interfaces for classes
 interface keyRequest extends Request {
-  key?: string;
+    key?: string;
 }
 
 //Middleware for API keys
 app.use("/api", async (req: keyRequest, res: Response, next: NextFunction) => {
-  const headers = req.headers["authorization"];
-  if (!headers) return res.status(401).json({ error: "No API token" });
+    const headers = req.headers["authorization"];
+    if (!headers) return res.status(401).json({ error: "No API token" });
 
-  const key = headers.split(" ")[1];
-  if ((await fetchTokenProfileByToken(key)) == null)
-    return res.status(401).json({ error: "Invalid API token" });
+    const key = headers.split(" ")[1];
+    if ((await fetchTokenProfileByToken(key)) == null)
+        return res.status(401).json({ error: "Invalid API token" });
 
-  req.key = key;
-  next();
+    req.key = key;
+    next();
 });
 
 app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: "draft-7",
-    legacyHeaders: false,
-    skip: async (req: keyRequest) =>
-      (await fetchTokenProfileByToken(
-        req.headers["authorization"]?.split(" ")[1] as string,
-      )) != null, //skip if the token is valid, otherwise apply rate limit to the ta;
-  }),
+    rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 100,
+        standardHeaders: "draft-7",
+        legacyHeaders: false,
+        skip: async (req: keyRequest) =>
+            (await fetchTokenProfileByToken(
+                req.headers["authorization"]?.split(" ")[1] as string,
+            )) != null, //skip if the token is valid, otherwise apply rate limit to the ta;
+    }),
 );
 
 //routers
@@ -52,14 +53,15 @@ app.use("/api/user", user_router);
 
 //public api
 app.use("/public_api/user", public_user_router);
+app.use("/public_api/frame", public_frame_router);
 
 app.get("/", (req: Request, res: Response) => {
-  res.json({ service: "OK" });
+    res.json({ service: "OK" });
 });
 
 app.listen(PORT, async () => {
-  await start_mongo_connection();
-  console.log(
-    `[server]: Server and datamodel is running at http://localhost:${PORT}`,
-  );
+    await start_mongo_connection();
+    console.log(
+        `[server]: Server and datamodel is running at http://localhost:${PORT}`,
+    );
 });
