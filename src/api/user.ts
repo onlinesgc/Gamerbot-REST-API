@@ -14,9 +14,9 @@ user_router.get('/:userid', async (req: Request, res: Response) => {
         new Date(),
         { userid: req.params['userid'] },
     )
-    const guild_data = await fetch_user(req.params['userid'])
+    let guild_data = await fetch_user(req.params['userid'])
     if (guild_data == null)
-        return res.status(400).json({ error: 'No data with that ID' })
+        guild_data = await create_user(req.params['userid'], '516605157795037185', Date.now(), Date.now() + 10 * 60 * 1000)
 
     return res.json(guild_data.toJSON())
 })

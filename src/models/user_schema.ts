@@ -36,6 +36,7 @@ const user_schema = new Schema({
     minecraftSecretCode: { type: String },
     old_messages: { type: Array },
     cachedImageLink: { type: String },
+    hashed_email: { type: String },
     extraObjects: { type: Map, default: {} },
 })
 
@@ -49,6 +50,7 @@ const user_model = model('ProfileModels', user_schema)
 const fetch_user = async (user_ID: string) => {
     const profileData = await user_model.findOne({ userID: { $eq: user_ID } })
     if (!profileData) return null
+    if(profileData.hashed_email == undefined) profileData.hashed_email = "";
     return profileData
 }
 

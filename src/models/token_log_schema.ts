@@ -50,6 +50,8 @@ const _createTokenLog = async (
     request_timestamp: Date,
     request_data: object,
 ) => {
+    //Log system is off until further investigation in how to make it work with a bot that spams requests
+    return;
     const tokenLogData = await token_log_model.create({
         token_id: token_id,
         request_type: request_type,
