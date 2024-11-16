@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose'
+import { Schema, model, sanitizeFilter } from 'mongoose'
 
 const user_schema = new Schema({
     userID: { type: String, require: true, unique: true },
@@ -96,7 +96,8 @@ const create_user = async (
  * @returns
  */
 const fetchAll = async (filter: object, maxUsers = -1) => {
-    filter = filter || {}
+    filter = sanitizeFilter(filter) || {}
+
     const profiles =
         maxUsers != -1
             ? user_model

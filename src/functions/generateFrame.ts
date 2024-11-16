@@ -43,7 +43,6 @@ export async function generateFrame(
     ctx.fillStyle = hex_color
     ctx.fillRect(0, 0, whidth, height)
     //Loads frame
-    console.log(frame_path)
     await loadImage(frame_path).then((img: Image) =>
         ctx.drawImage(img, 0, 0, whidth, height),
     )

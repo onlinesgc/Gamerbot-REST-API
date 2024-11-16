@@ -12,6 +12,7 @@ import { public_frame_router } from './public_api/frame'
 //setup environment variables
 dotenv.config()
 
+//Create express app
 const app: Express = express()
 const PORT = process.env.PORT || 3000
 
@@ -33,6 +34,7 @@ app.use('/api', async (req: keyRequest, res: Response, next: NextFunction) => {
     next()
 })
 
+//Rate limiter for the API. Max 100 requests per 15 minutes. If the token is valid, the rate limit is not applied.
 app.use(
     rateLimit({
         windowMs: 15 * 60 * 1000,
@@ -55,6 +57,7 @@ app.use('/api/user', user_router)
 app.use('/public_api/user', public_user_router)
 app.use('/public_api/frame', public_frame_router)
 
+//root endpoint
 app.get('/', (req: Request, res: Response) => {
     res.json({ service: 'OK' })
 })

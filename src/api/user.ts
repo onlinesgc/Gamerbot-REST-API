@@ -14,7 +14,10 @@ user_router.get('/:userid', async (req: Request, res: Response) => {
         new Date(),
         { userid: req.params['userid'] },
     )
+    //fetch user data
     let guild_data = await fetch_user(req.params['userid'])
+
+    //if user data is not found, create a new one
     if (guild_data == null)
         guild_data = await create_user(req.params['userid'], '516605157795037185', Date.now(), Date.now() + 10 * 60 * 1000)
 
@@ -25,18 +28,22 @@ user_router.get('/:userid', async (req: Request, res: Response) => {
 //Returns the user data for the given filter
 user_router.post('/fetch_many', async (req: Request, res: Response) => {
     const json_body = req.body
+
     createTokenLog(
         req.headers['authorization'] as string,
         'POST /api/user/fetch_many',
         new Date(),
         { filter: json_body.filter },
     )
+
     if (json_body.filter == null)
         return res.status(400).json({ error: 'No filter key in body' })
+
     const users =
         json_body.maxUsers == null
             ? await fetchAll(json_body.filter)
             : await fetchAll(json_body.filter, json_body.maxUsers)
+    
     res.json(users)
 })
 
@@ -44,13 +51,17 @@ user_router.post('/fetch_many', async (req: Request, res: Response) => {
 //Updates the user data for the given userid
 user_router.post('/:userid', async (req: Request, res: Response) => {
     const json_body = req.body
+
     createTokenLog(
         req.headers['authorization'] as string,
         'POST /api/user/:userid',
         new Date(),
         { userid: req.params['userid'], body: json_body },
     )
+
     const user_data = await fetch_user(req.params['userid'])
+
+    //update given keys.
     for (const key in json_body) {
         if (user_data?.get(key) == null)
             return res
@@ -58,6 +69,7 @@ user_router.post('/:userid', async (req: Request, res: Response) => {
                 .json({ error: `no ${key} key was found in the user data` })
         user_data.set(key, json_body[key])
     }
+
     res.json({ message: 'Updated user data' })
     user_data?.save()
 })
