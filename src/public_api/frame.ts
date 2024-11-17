@@ -85,10 +85,9 @@ public_frame_router.post('/get/config', async (req: Request, res: Response) => {
     const config = await fetch_guild_config(guild_id)
     //eslint-disable-next-line
     let frame_config: any[] = config?.frameConfig as unknown as any[]
-    const PORT = process.env.PORT || 3000
     frame_config.map(
         (frame) =>
-            (frame.frameLink = `http://localhost:${PORT}/public_api/frame/get/${guild_id}/${frame.id}`),
+            (frame.frameLink = `https://api.sgc.se/public_api/frame/get/${guild_id}/${frame.id}`),
     )
     return res.json(frame_config)
 })

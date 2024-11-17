@@ -65,6 +65,6 @@ app.get('/', (req: Request, res: Response) => {
 app.listen(PORT, async () => {
     await start_mongo_connection()
     console.log(
-        `[server]: Server and datamodel is running at http://localhost:${PORT}`,
+        `[server]: Server and datamodel is running at https://api.sgc.se:${PORT}`,
     )
 })
