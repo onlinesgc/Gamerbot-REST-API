@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import express, { Express, NextFunction, Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import { start_mongo_connection } from './models/startup'
 import { config_router } from './api/config'
 import { guild_router } from './api/guild'
@@ -10,7 +10,7 @@ import { rateLimit } from 'express-rate-limit'
 import { public_frame_router } from './public_api/frame'
 
 //Create express app
-const app: Express = express()
+const app = express()
 const PORT = process.env.PORT || 3000
 
 //Interfaces for classes
