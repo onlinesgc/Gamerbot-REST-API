@@ -11,7 +11,7 @@ import { public_frame_router } from './public_api/frame'
 
 //Create express app
 const app = express()
-const PORT = process.env.PORT || 3000
+const port = process.env.PORT || 3000
 
 //Interfaces for classes
 interface keyRequest extends Request {
@@ -59,9 +59,9 @@ app.get('/', (req: Request, res: Response) => {
     res.json({ service: 'OK' })
 })
 
-app.listen(PORT, async () => {
+app.listen(port, async () => {
     await start_mongo_connection()
     console.log(
-        `[server]: Server and datamodel is running at https://api.sgc.se:${PORT}`,
+        `[server]: Server and datamodel is running at https://api.sgc.se:${port}`,
     )
 })
