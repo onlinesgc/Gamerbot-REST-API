@@ -1,5 +1,5 @@
+import 'dotenv/config'
 import express, { Express, NextFunction, Request, Response } from 'express'
-import dotenv from 'dotenv'
 import { start_mongo_connection } from './models/startup'
 import { config_router } from './api/config'
 import { guild_router } from './api/guild'
@@ -8,9 +8,6 @@ import { public_user_router } from './public_api/user'
 import { fetchTokenProfileByToken } from './models/token_schema'
 import { rateLimit } from 'express-rate-limit'
 import { public_frame_router } from './public_api/frame'
-
-//setup environment variables
-dotenv.config()
 
 //Create express app
 const app: Express = express()
