@@ -4,6 +4,7 @@ import { rateLimit } from "express-rate-limit";
 import { config_router } from "./api/config";
 import { guild_router } from "./api/guild";
 import { user_router } from "./api/user";
+import prometheusMiddleware from "./middlewares/prometheus";
 import { start_mongo_connection } from "./models/startup";
 import { fetchTokenProfileByToken } from "./models/token_schema";
 import { public_frame_router } from "./public_api/frame";
@@ -17,6 +18,8 @@ const port = process.env.PORT || 3000;
 interface keyRequest extends Request {
   key?: string;
 }
+
+app.use(prometheusMiddleware);
 
 //Middleware for API keys
 app.use("/api", async (req: keyRequest, res: Response, next: NextFunction) => {
