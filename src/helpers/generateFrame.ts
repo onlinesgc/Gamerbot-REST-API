@@ -1,26 +1,21 @@
 import { createCanvas, Image, loadImage, registerFont } from "canvas";
 import path from "path";
 import { fetch_guild_config } from "../models/guild_schema";
-/**
- * generates a frame for player
- * @param guild_id
- */
-export async function generateFrame(
+
+export const generateFrame = async (
   name: string,
   frame: number,
   hex_color: string,
   level: string,
   xpPercentage: number,
   member_avatar_url: string,
-  guild_id: string = "516605157795037185"
-) {
-  const guild_config = await fetch_guild_config(guild_id);
-
-  if (guild_config == null) return null;
-  if (guild_config.frameConfig == null) return null;
+  guildId: string = "516605157795037185"
+) => {
+  const guildConfig = await fetch_guild_config(guildId);
+  if (!guildConfig?.frameConfig) return;
 
   //eslint-disable-next-line
-  const frame_config = guild_config.frameConfig as unknown as Array<any>;
+  const frame_config = guildConfig.frameConfig as unknown as Array<any>;
   const frame_path = path.resolve("./") + "/" + frame_config[frame].path;
   if (frame_path == undefined) return null;
   const foreground_frame_path =
@@ -28,7 +23,7 @@ export async function generateFrame(
       ? frame_config[frame].foregroundPath
       : null;
 
-  const whidth = 500;
+  const width = 500;
   const height = 800;
 
   //INFO: Don't work on windows
@@ -36,21 +31,21 @@ export async function generateFrame(
     family: "Sansumu 02",
   });
 
-  const canvas = createCanvas(whidth, height);
+  const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
   //background color
   ctx.fillStyle = hex_color;
-  ctx.fillRect(0, 0, whidth, height);
+  ctx.fillRect(0, 0, width, height);
   //Loads frame
   await loadImage(frame_path).then((img: Image) =>
-    ctx.drawImage(img, 0, 0, whidth, height)
+    ctx.drawImage(img, 0, 0, width, height)
   );
 
   //loads avatar
   if (member_avatar_url != null) {
     await loadImage(member_avatar_url).then((img: Image) =>
-      ctx.drawImage(img, whidth / 2 - 125, 80, 250, 250)
+      ctx.drawImage(img, width / 2 - 125, 80, 250, 250)
     );
   }
 
@@ -58,37 +53,38 @@ export async function generateFrame(
   ctx.font = "50pt Sansumu 02";
   ctx.textAlign = "center";
   ctx.fillStyle = "#FFFFFF";
-  ctx.fillText(name, whidth / 2, 400);
+  ctx.fillText(name, width / 2, 400);
 
   //writes level
   ctx.font = "40pt Sansumu 02";
-  ctx.fillText(`Level: ${level}`, whidth / 2, 470);
+  ctx.fillText(`Level: ${level}`, width / 2, 470);
 
   //renders xp bar
-  const multipler = 3.5;
-  const fild_bar = 100 * multipler + 10;
-  const bar = xpPercentage * multipler + 10;
+  const multiplier = 3.5;
+  const filledBar = 100 * multiplier + 10;
+  const bar = xpPercentage * multiplier + 10;
   ctx.fillStyle = "#898C87";
-  roundRect(ctx, 65, 500, fild_bar, 40, 20, true, false);
+  roundRect(ctx, 65, 500, filledBar, 40, 20, true, false);
   ctx.fillStyle = "#ffffff";
   roundRect(ctx, 65, 500, bar, 40, 20, true, false);
 
   //writes xp amount
   ctx.font = "40pt Sansumu 02";
-  ctx.fillText(`${xpPercentage}%`, whidth / 2, 600);
+  ctx.fillText(`${xpPercentage}%`, width / 2, 600);
 
   //loads foreground frame if there is one
   if (foreground_frame_path != null) {
     await loadImage(foreground_frame_path).then((img: Image) =>
-      ctx.drawImage(img, 0, 0, whidth, height)
+      ctx.drawImage(img, 0, 0, width, height)
     );
   }
 
   //returns the image
   return canvas.toBuffer("image/png");
-}
-// soruce : https://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-using-html-canvas/68359160#68359160
-function roundRect(
+};
+
+// source : https://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-using-html-canvas/68359160#68359160
+export const roundRect = (
   //eslint-disable-next-line
   ctx: any,
   x: number,
@@ -99,7 +95,7 @@ function roundRect(
   radius: any,
   fill: boolean,
   stroke: boolean
-) {
+) => {
   if (typeof stroke === "undefined") {
     stroke = true;
   }
@@ -138,4 +134,4 @@ function roundRect(
   if (stroke) {
     ctx.stroke();
   }
-}
+};

@@ -2,7 +2,7 @@ import { json, Request, Response, Router } from "express";
 import fs from "fs";
 import path from "path";
 import sanitize from "sanitize-filename";
-import { generateFrame } from "../functions/generateFrame";
+import { generateFrame } from "../helpers/generateFrame";
 import { fetch_config } from "../models/config_schema";
 import { fetch_guild_config } from "../models/guild_schema";
 
