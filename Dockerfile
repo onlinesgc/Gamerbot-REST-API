@@ -1,11 +1,22 @@
-FROM node:lts-alpine
-ENV NODE_ENV=production
-ENV PORT=3000, MONGO_SRV=mongSrv, API_CONFIG_ID=0
-WORKDIR /usr/src/app
-COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent && mv node_modules ../
+# Dependencies
+FROM node:22-alpine AS dependencies
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install
+
+# Build
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
+RUN npm run build
+
+# Deploy
+FROM node:22-alpine as deploy
+WORKDIR /app
+ENV NODE_ENV production
 EXPOSE 3000
-RUN chown -R node /dist/index.js
-USER node
-CMD ["npm", "start"]
+COPY --from=build /app/package.json ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+CMD [ "npm", "run", "start" ]
