@@ -2,7 +2,7 @@
     "name": "gamerbot-rest-api",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "dist/index.js",
     "scripts": {
         "dev": "tsc --watch & NODE_ENV=development nodemon dist",
         "build": "npx tsc",
