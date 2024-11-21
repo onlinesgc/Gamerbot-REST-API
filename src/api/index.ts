@@ -1,4 +1,5 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { NextFunction, Response, Router } from "express";
+import KeyRequest from "../interfaces/KeyRequest";
 import { fetchTokenProfileByToken } from "../models/token_schema";
 import { config_router } from "./config";
 import { guild_router } from "./guild";
@@ -6,11 +7,7 @@ import { user_router } from "./user";
 
 const apiRouter = Router();
 
-interface keyRequest extends Request {
-  key?: string;
-}
-
-apiRouter.use(async (req: keyRequest, res: Response, next: NextFunction) => {
+apiRouter.use(async (req: KeyRequest, res: Response, next: NextFunction) => {
   const headers = req.headers["authorization"];
   if (!headers) return res.status(401).json({ error: "No API token" });
 

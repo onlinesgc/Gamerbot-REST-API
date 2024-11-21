@@ -2,6 +2,7 @@ import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import { rateLimit } from "express-rate-limit";
 import apiRouter from "./api";
+import KeyRequest from "./interfaces/KeyRequest";
 import prometheusMiddleware from "./middlewares/prometheus";
 import { start_mongo_connection } from "./models/startup";
 import { fetchTokenProfileByToken } from "./models/token_schema";
@@ -27,7 +28,7 @@ app.use(
     max: 100,
     standardHeaders: "draft-7",
     legacyHeaders: false,
-    skip: async (req: keyRequest) =>
+    skip: async (req: KeyRequest) =>
       (await fetchTokenProfileByToken(
         req.headers["authorization"]?.split(" ")[1] as string
       )) != null, //skip if the token is valid, otherwise apply rate limit to the ta;
