@@ -1,38 +1,24 @@
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import { rateLimit } from "express-rate-limit";
-import { config_router } from "./api/config";
-import { guild_router } from "./api/guild";
-import { user_router } from "./api/user";
+import apiRouter from "./api";
 import prometheusMiddleware from "./middlewares/prometheus";
 import { start_mongo_connection } from "./models/startup";
 import { fetchTokenProfileByToken } from "./models/token_schema";
 import { public_frame_router } from "./public_api/frame";
 import { public_user_router } from "./public_api/user";
+import logger from "./utils/logger";
 
 //Create express app
 const app = express();
 const port = process.env.PORT || 3000;
 
-//Interfaces for classes
-interface keyRequest extends Request {
-  key?: string;
-}
-
-app.use(prometheusMiddleware);
-
-//Middleware for API keys
-app.use("/api", async (req: keyRequest, res: Response, next: NextFunction) => {
-  const headers = req.headers["authorization"];
-  if (!headers) return res.status(401).json({ error: "No API token" });
-
-  const key = headers.split(" ")[1];
-  if ((await fetchTokenProfileByToken(key)) == null)
-    return res.status(401).json({ error: "Invalid API token" });
-
-  req.key = key;
+app.use((req: Request, res: Response, next: NextFunction) => {
+  logger.silly(req.originalUrl);
   next();
 });
+
+app.use(prometheusMiddleware);
 
 //Rate limiter for the API. Max 100 requests per 15 minutes. If the token is valid, the rate limit is not applied.
 app.use(
@@ -48,10 +34,7 @@ app.use(
   })
 );
 
-//routers
-app.use("/api/config", config_router);
-app.use("/api/guild", guild_router);
-app.use("/api/user", user_router);
+app.use("/api", apiRouter);
 
 //public api
 app.use("/public_api/user", public_user_router);
@@ -64,7 +47,5 @@ app.get("/", (req: Request, res: Response) => {
 
 app.listen(port, async () => {
   await start_mongo_connection();
-  console.log(
-    `[server]: Server and datamodel is running at https://api.sgc.se:${port}`
-  );
+  logger.info(`Listening on port ${port}`);
 });
