@@ -30,9 +30,9 @@ app.use(
     legacyHeaders: false,
     skip: async (req: KeyRequest) =>
       (await fetchTokenProfileByToken(
-        req.headers["authorization"]?.split(" ")[1] as string
+        req.headers["authorization"]?.split(" ")[1] as string,
       )) != null, //skip if the token is valid, otherwise apply rate limit to the ta;
-  })
+  }),
 );
 
 app.use("/api", apiRouter);

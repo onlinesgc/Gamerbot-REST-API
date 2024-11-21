@@ -12,7 +12,7 @@ config_router.get("/:configid", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "GET /api/config/:configid",
     new Date(),
-    { configid: req.params["configid"] }
+    { configid: req.params["configid"] },
   );
   const config_data = await fetch_config(req.params["configid"]);
   if (config_data == null)
@@ -29,7 +29,7 @@ config_router.post("/:configid", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "POST /api/config/:configid",
     new Date(),
-    { configid: req.params["configid"], body: json_body }
+    { configid: req.params["configid"], body: json_body },
   );
   const config_data = await fetch_config(req.params["configid"]);
   for (const key in json_body) {
@@ -53,7 +53,7 @@ config_router.post(
       req.headers["authorization"] as string,
       "POST /api/config/:configid/add_obj",
       new Date(),
-      { configid: req.params["configid"], body: json_body }
+      { configid: req.params["configid"], body: json_body },
     );
     const config_data = await fetch_config(req.params["configid"]);
 
@@ -63,7 +63,7 @@ config_router.post(
     config_data?.extraObjects.set(json_body.key, json_body.value);
     config_data?.save();
     res.json(config_data?.toJSON());
-  }
+  },
 );
 
 //DELETE /api/config/:configid/remove_obj
@@ -76,7 +76,7 @@ config_router.delete(
       req.headers["authorization"] as string,
       "DELETE /api/config/:configid/remove_obj",
       new Date(),
-      { configid: req.params["configid"], body: json_body }
+      { configid: req.params["configid"], body: json_body },
     );
     const config_data = await fetch_config(req.params["configid"]);
 
@@ -86,7 +86,7 @@ config_router.delete(
     config_data?.extraObjects.delete(json_body.key);
     config_data?.save();
     res.json(config_data?.toJSON());
-  }
+  },
 );
 
 export { config_router };

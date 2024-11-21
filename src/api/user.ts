@@ -12,7 +12,7 @@ user_router.get("/:userid", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "GET /api/user/:userid",
     new Date(),
-    { userid: req.params["userid"] }
+    { userid: req.params["userid"] },
   );
   //fetch user data
   let guild_data = await fetch_user(req.params["userid"]);
@@ -23,7 +23,7 @@ user_router.get("/:userid", async (req: Request, res: Response) => {
       req.params["userid"],
       "516605157795037185",
       Date.now(),
-      Date.now() + 10 * 60 * 1000
+      Date.now() + 10 * 60 * 1000,
     );
 
   return res.json(guild_data.toJSON());
@@ -38,7 +38,7 @@ user_router.post("/fetch_many", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "POST /api/user/fetch_many",
     new Date(),
-    { filter: json_body.filter }
+    { filter: json_body.filter },
   );
 
   if (json_body.filter == null)
@@ -61,7 +61,7 @@ user_router.post("/:userid", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "POST /api/user/:userid",
     new Date(),
-    { userid: req.params["userid"], body: json_body }
+    { userid: req.params["userid"], body: json_body },
   );
 
   const user_data = await fetch_user(req.params["userid"]);
@@ -87,7 +87,7 @@ user_router.post("/:userid/add_obj", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "POST /api/user/:userid/add_obj",
     new Date(),
-    { userid: req.params["userid"], body: json_body }
+    { userid: req.params["userid"], body: json_body },
   );
   const user_data = await fetch_user(req.params["userid"]);
   if (json_body.value == null || json_body.key == null)
@@ -108,7 +108,7 @@ user_router.delete(
       req.headers["authorization"] as string,
       "DELETE /api/user/:userid/remove_obj",
       new Date(),
-      { userid: req.params["userid"], body: json_body }
+      { userid: req.params["userid"], body: json_body },
     );
     const user_data = await fetch_user(req.params["userid"]);
 
@@ -118,7 +118,7 @@ user_router.delete(
     user_data?.extraObjects.delete(json_body.key);
     user_data?.save();
     res.json(user_data?.toJSON());
-  }
+  },
 );
 
 //POST /api/user/create
@@ -129,7 +129,7 @@ user_router.post("/create", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "POST /api/user/create",
     new Date(),
-    { body: json_body }
+    { body: json_body },
   );
   const guild_data = await fetch_user(json_body.userID);
   if (guild_data != null)
@@ -147,7 +147,7 @@ user_router.post("/create", async (req: Request, res: Response) => {
     json_body.userID,
     json_body.serverID,
     json_body.lastMessageTimestamp,
-    json_body.xpTimeoutUntil
+    json_body.xpTimeoutUntil,
   );
   res.json(new_user_data?.toJSON());
 });

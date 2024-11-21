@@ -66,10 +66,10 @@ const fetch_user = async (user_ID: string) => {
 const create_user = async (
   user_ID: string,
   server_ID: string,
-  last_message_timestamp: number = 0,
-  xp_timeout_until: number = 0,
+  last_message_timestamp = 0,
+  xp_timeout_until = 0,
   color_hex_code = "#787C75",
-  profile_frame = 0
+  profile_frame = 0,
 ) => {
   const profileData = await user_model.create({
     userID: user_ID,

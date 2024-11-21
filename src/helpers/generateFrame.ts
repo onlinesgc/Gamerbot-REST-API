@@ -9,7 +9,7 @@ export const generateFrame = async (
   level: string,
   xpPercentage: number,
   member_avatar_url: string,
-  guildId: string = "516605157795037185"
+  guildId = "516605157795037185",
 ) => {
   const guildConfig = await fetch_guild_config(guildId);
   if (!guildConfig?.frameConfig) return;
@@ -39,13 +39,13 @@ export const generateFrame = async (
   ctx.fillRect(0, 0, width, height);
   //Loads frame
   await loadImage(frame_path).then((img: Image) =>
-    ctx.drawImage(img, 0, 0, width, height)
+    ctx.drawImage(img, 0, 0, width, height),
   );
 
   //loads avatar
   if (member_avatar_url != null) {
     await loadImage(member_avatar_url).then((img: Image) =>
-      ctx.drawImage(img, width / 2 - 125, 80, 250, 250)
+      ctx.drawImage(img, width / 2 - 125, 80, 250, 250),
     );
   }
 
@@ -75,7 +75,7 @@ export const generateFrame = async (
   //loads foreground frame if there is one
   if (foreground_frame_path != null) {
     await loadImage(foreground_frame_path).then((img: Image) =>
-      ctx.drawImage(img, 0, 0, width, height)
+      ctx.drawImage(img, 0, 0, width, height),
     );
   }
 
@@ -94,7 +94,7 @@ export const roundRect = (
   //eslint-disable-next-line
   radius: any,
   fill: boolean,
-  stroke: boolean
+  stroke: boolean,
 ) => {
   if (typeof stroke === "undefined") {
     stroke = true;
@@ -121,7 +121,7 @@ export const roundRect = (
     x + width,
     y + height,
     x + width - radius.br,
-    y + height
+    y + height,
   );
   ctx.lineTo(x + radius.bl, y + height);
   ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);

@@ -15,7 +15,7 @@ guild_router.get("/:guildid", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "GET /api/guild/:guildid",
     new Date(),
-    { guildid: req.params["guildid"] }
+    { guildid: req.params["guildid"] },
   );
   const guild_data = await fetch_guild_config(req.params["guildid"]);
   if (guild_data == null)
@@ -32,7 +32,7 @@ guild_router.post("/:guildid", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "POST /api/guild/:guildid",
     new Date(),
-    { guildid: req.params["guildid"], body: json_body }
+    { guildid: req.params["guildid"], body: json_body },
   );
   const guild_data = await fetch_guild_config(req.params["guildid"]);
   for (const key in json_body) {
@@ -54,7 +54,7 @@ guild_router.post("/:guildid/add_obj", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "POST /api/guild/:guildid/add_obj",
     new Date(),
-    { guildid: req.params["guildid"], body: json_body }
+    { guildid: req.params["guildid"], body: json_body },
   );
   const guild_data = await fetch_guild_config(req.params["guildid"]);
 
@@ -76,7 +76,7 @@ guild_router.delete(
       req.headers["authorization"] as string,
       "DELETE /api/guild/:guildid/remove_obj",
       new Date(),
-      { guildid: req.params["guildid"], body: json_body }
+      { guildid: req.params["guildid"], body: json_body },
     );
     const guild_data = await fetch_guild_config(req.params["guildid"]);
 
@@ -86,7 +86,7 @@ guild_router.delete(
     guild_data?.extraObjects.delete(json_body.key);
     guild_data?.save();
     res.json(guild_data?.toJSON());
-  }
+  },
 );
 
 //POST /api/guild/create
@@ -97,7 +97,7 @@ guild_router.post("/create", async (req: Request, res: Response) => {
     req.headers["authorization"] as string,
     "POST /api/guild/create",
     new Date(),
-    { body: json_body }
+    { body: json_body },
   );
   const guild_data = await fetch_guild_config(json_body.guildID);
   if (guild_data != null)

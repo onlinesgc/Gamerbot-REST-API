@@ -34,21 +34,21 @@ export const createTokenLog = async (
   token_headers: string,
   request_type: string,
   request_timestamp: Date,
-  request_data: object
+  request_data: object,
 ) => {
   const key = token_headers.split(" ")[1];
   return await _createTokenLog(
     (await fetchTokenProfileByToken(key))?.token_id as number,
     request_type,
     request_timestamp,
-    request_data
+    request_data,
   );
 };
 const _createTokenLog = async (
   token_id: number,
   request_type: string,
   request_timestamp: Date,
-  request_data: object
+  request_data: object,
 ) => {
   //Log system is off until further investigation in how to make it work with a bot that spams requests
   return;
