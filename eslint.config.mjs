@@ -10,6 +10,11 @@ export default [
   { ignores: ["**/dist/*"] },
   { languageOptions: { globals: globals.node } },
   { plugins: { tseslint } },
+  {
+    rules: {
+      "@typescript-eslint/naming-convention": "warn",
+    },
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   ...tseslint.configs.stylistic,
