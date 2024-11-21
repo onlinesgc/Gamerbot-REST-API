@@ -1,0 +1,25 @@
+{
+    "editor.bracketPairColorization.enabled": true,
+    "editor.cursorBlinking": "phase",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.fontLigatures": true,
+    "editor.formatOnSave": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.minimap.maxColumn": 200,
+    "editor.minimap.renderCharacters": false,
+    "editor.minimap.showSlider": "always",
+    "editor.tabSize": 2,
+    //  "git.enableCommitSigning": true,
+    "editor.wordWrapColumn": 100,
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always",
+        "source.formatDocument": "always",
+        "source.fixAll.eslint": "always"
+    },
+    "[dotenv]": {
+        "editor.defaultFormatter": "IronGeek.vscode-env"
+    }
+}
