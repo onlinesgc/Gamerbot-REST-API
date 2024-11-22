@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const vote_profile_schema = new Schema({
+const voteProfileSchema = new Schema({
   userID: { type: String, require: true, unique: true },
   hasVoted: { type: Boolean, default: false },
   hasMobVoted: { type: Boolean, default: false },
@@ -8,18 +8,13 @@ const vote_profile_schema = new Schema({
   mobvote: { type: String },
 });
 
-const vote_model = model("voteProfileModuel", vote_profile_schema);
+const voteModel = model("voteProfileModuel", voteProfileSchema);
 
-/**
- * fetch vote profile
- * @param user_ID user id
- * @returns vote profile
- */
-export const fetchVoteProfile = async (user_ID: string) => {
-  let voteProfileData = await vote_model.findOne({ userID: user_ID });
+export const fetchVoteProfile = async (userId: string) => {
+  let voteProfileData = await voteModel.findOne({ userID: userId });
   if (!voteProfileData) {
-    voteProfileData = await vote_model.create({
-      userID: user_ID,
+    voteProfileData = await voteModel.create({
+      userID: userId,
     });
     await voteProfileData.save();
   }

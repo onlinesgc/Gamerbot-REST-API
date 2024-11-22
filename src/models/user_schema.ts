@@ -1,6 +1,6 @@
 import { Schema, model, sanitizeFilter } from "mongoose";
 
-const user_schema = new Schema({
+const userSchema = new Schema({
   userID: { type: String, require: true, unique: true },
   serverID: { type: String, require: true },
   xp: { type: Number, default: 0 },
@@ -34,53 +34,41 @@ const user_schema = new Schema({
   minecraftUsername: { type: String },
   minecraftUuid: { type: String },
   minecraftSecretCode: { type: String },
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   old_messages: { type: Array },
   cachedImageLink: { type: String },
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   hashed_email: { type: String },
   extraObjects: { type: Map, default: {} },
 });
 
-const user_model = model("ProfileModels", user_schema);
+const userModel = model("ProfileModels", userSchema);
 
-/**
- * Fetch user
- * @param user_ID user id
- * @returns user profile
- */
-const fetch_user = async (user_ID: string) => {
-  const profileData = await user_model.findOne({ userID: { $eq: user_ID } });
+export const fetchUser = async (userId: string) => {
+  const profileData = await userModel.findOne({ userID: { $eq: userId } });
   if (!profileData) return null;
   if (profileData.hashed_email == undefined) profileData.hashed_email = "";
   return profileData;
 };
 
-/**
- * Create user
- * @param user_ID
- * @param server_ID
- * @param last_message_timestamp
- * @param xp_timeout_until
- * @param color_hex_code
- * @param profile_frame
- */
-const create_user = async (
-  user_ID: string,
-  server_ID: string,
-  last_message_timestamp = 0,
-  xp_timeout_until = 0,
-  color_hex_code = "#787C75",
-  profile_frame = 0,
+export const createUser = async (
+  userId: string,
+  serverId: string,
+  lastMessageTimestamp = 0,
+  xpTimeoutUntil = 0,
+  colorHexCode = "#787C75",
+  profileFrame = 0,
 ) => {
-  const profileData = await user_model.create({
-    userID: user_ID,
-    serverID: server_ID,
+  const profileData = await userModel.create({
+    userId,
+    serverId,
     xp: 0,
-    lastMessageTimestamp: last_message_timestamp,
-    xpTimeoutUntil: xp_timeout_until,
+    lastMessageTimestamp,
+    xpTimeoutUntil,
     level: 1,
     reminders: [],
-    colorHexCode: color_hex_code,
-    profileFrame: profile_frame,
+    colorHexCode,
+    profileFrame,
     exclusiveFrames: [],
     minecraftUsername: null,
     minecraftUuid: null,
@@ -89,24 +77,17 @@ const create_user = async (
   await profileData.save();
   return profileData;
 };
-/**
- * fetch all users with filter
- * @param filter
- * @param maxUsers
- * @returns
- */
-const fetchAll = async (filter: object, maxUsers = -1) => {
+
+export const fetchAll = async (filter: object, maxUsers = -1) => {
   filter = sanitizeFilter(filter) || {};
 
   const profiles =
     maxUsers != -1
-      ? user_model
+      ? userModel
           .find(filter)
           .sort({ level: -1 })
           .sort({ xp: -1 })
           .limit(maxUsers)
-      : user_model.find(filter).sort({ level: -1 }).sort({ xp: -1 });
+      : userModel.find(filter).sort({ level: -1 }).sort({ xp: -1 });
   return profiles;
 };
-
-export { create_user, fetchAll, fetch_user, user_model };

@@ -1,5 +1,5 @@
 import { Request, Response, Router, json } from "express";
-import { fetch_config } from "../models/config_schema";
+import { fetchConfig } from "../models/config_schema";
 import { createTokenLog } from "../models/token_log_schema";
 
 const config_router = Router();
@@ -14,7 +14,7 @@ config_router.get("/:configid", async (req: Request, res: Response) => {
     new Date(),
     { configid: req.params["configid"] },
   );
-  const config_data = await fetch_config(req.params["configid"]);
+  const config_data = await fetchConfig(req.params["configid"]);
   if (config_data == null)
     return res.status(400).json({ error: "No data with that ID" });
 
@@ -31,7 +31,7 @@ config_router.post("/:configid", async (req: Request, res: Response) => {
     new Date(),
     { configid: req.params["configid"], body: json_body },
   );
-  const config_data = await fetch_config(req.params["configid"]);
+  const config_data = await fetchConfig(req.params["configid"]);
   for (const key in json_body) {
     if (config_data?.get(key) == null)
       return res
@@ -55,7 +55,7 @@ config_router.post(
       new Date(),
       { configid: req.params["configid"], body: json_body },
     );
-    const config_data = await fetch_config(req.params["configid"]);
+    const config_data = await fetchConfig(req.params["configid"]);
 
     if (json_body.value == null || json_body.key == null)
       return res.status(400).json({ error: "No value key in body" });
@@ -78,7 +78,7 @@ config_router.delete(
       new Date(),
       { configid: req.params["configid"], body: json_body },
     );
-    const config_data = await fetch_config(req.params["configid"]);
+    const config_data = await fetchConfig(req.params["configid"]);
 
     if (json_body.key == null)
       return res.status(400).json({ error: "No key key in body" });

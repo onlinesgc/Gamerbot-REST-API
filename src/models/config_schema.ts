@@ -8,14 +8,17 @@ const configSchema = new Schema({
   activity: { type: String },
   activityType: { type: String },
   removeLinks: { type: Boolean, default: false },
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   NotisSystemOn: { type: Boolean, default: false },
   notifcationReloadTime: { type: Number },
   cacheQueue: { type: Array<string> },
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   NotisChannels: {
     type: Array,
     default: {
       // Channels where stream/video-notifications are sent
       id: "UCOZr_fd45CDuyqQEPQZaqMA",
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       Notis: true,
     },
   },
@@ -46,16 +49,16 @@ export const configModel = model("ConfigModel", configSchema);
  * @param id id of the config you want to fetch
  * @returns
  */
-export const fetch_config = async (id: string) => {
+export const fetchConfig = async (id: string) => {
   const configData = await configModel.findOne({ id: { $eq: id } });
-  if (!configData) return await create_config(id);
+  if (!configData) return await createConfig(id);
   return configData;
 };
 /**
  * creates a new config
  * @param id config id
  */
-export const create_config = async (id: string) => {
+export const createConfig = async (id: string) => {
   const configData = await configModel.create({
     id: id,
     username: "GamerBot3.0",

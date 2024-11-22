@@ -4,10 +4,10 @@ import { rateLimit } from "express-rate-limit";
 import apiRouter from "./api";
 import KeyRequest from "./interfaces/KeyRequest";
 import prometheusMiddleware from "./middlewares/prometheus";
-import { start_mongo_connection } from "./models/startup";
+import { startMongoConnection } from "./models/startup";
 import { fetchTokenProfileByToken } from "./models/token_schema";
 import { public_frame_router } from "./public_api/frame";
-import { public_user_router } from "./public_api/user";
+import { publicUserRouter } from "./public_api/user";
 import logger from "./utils/logger";
 
 //Create express app
@@ -38,7 +38,7 @@ app.use(
 app.use("/api", apiRouter);
 
 //public api
-app.use("/public_api/user", public_user_router);
+app.use("/public_api/user", publicUserRouter);
 app.use("/public_api/frame", public_frame_router);
 
 //root endpoint
@@ -47,6 +47,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.listen(port, async () => {
-  await start_mongo_connection();
+  await startMongoConnection();
   logger.info(`Listening on port ${port}`);
 });

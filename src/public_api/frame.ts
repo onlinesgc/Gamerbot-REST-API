@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import sanitize from "sanitize-filename";
 import { generateFrame } from "../helpers/generateFrame";
-import { fetch_config } from "../models/config_schema";
+import { fetchConfig } from "../models/config_schema";
 import { fetch_guild_config } from "../models/guild_schema";
 
 const public_frame_router = Router();
@@ -26,7 +26,7 @@ public_frame_router.post("/generate", async (req: Request, res: Response) => {
   )
     return res.status(400).json({ error: "Missing fields" });
 
-  const config = await fetch_config(process.env.API_CONFIG_ID as string);
+  const config = await fetchConfig(process.env.API_CONFIG_ID as string);
 
   const member_avatar_url =
     json_body.avatar_url != null ? json_body.avatar_url : null;

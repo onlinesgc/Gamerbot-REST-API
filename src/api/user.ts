@@ -1,6 +1,6 @@
 import { Request, Response, Router, json } from "express";
 import { createTokenLog } from "../models/token_log_schema";
-import { create_user, fetchAll, fetch_user } from "../models/user_schema";
+import { createUser, fetchAll, fetchUser } from "../models/user_schema";
 
 const user_router = Router();
 user_router.use(json());
@@ -15,16 +15,19 @@ user_router.get("/:userid", async (req: Request, res: Response) => {
     { userid: req.params["userid"] },
   );
   //fetch user data
-  let guild_data = await fetch_user(req.params["userid"]);
+  let guild_data = await fetchUser(req.params["userid"]);
 
   //if user data is not found, create a new one
-  if (guild_data == null)
-    guild_data = await create_user(
+  if (!guild_data) {
+    guild_data = await createUser(
       req.params["userid"],
       "516605157795037185",
       Date.now(),
       Date.now() + 10 * 60 * 1000,
     );
+  }
+
+  if (!guild_data) return res.status(400).json({ error: "No guild data" });
 
   return res.json(guild_data.toJSON());
 });
@@ -64,7 +67,7 @@ user_router.post("/:userid", async (req: Request, res: Response) => {
     { userid: req.params["userid"], body: json_body },
   );
 
-  const user_data = await fetch_user(req.params["userid"]);
+  const user_data = await fetchUser(req.params["userid"]);
 
   //update given keys.
   for (const key in json_body) {
@@ -89,7 +92,7 @@ user_router.post("/:userid/add_obj", async (req: Request, res: Response) => {
     new Date(),
     { userid: req.params["userid"], body: json_body },
   );
-  const user_data = await fetch_user(req.params["userid"]);
+  const user_data = await fetchUser(req.params["userid"]);
   if (json_body.value == null || json_body.key == null)
     return res.status(400).json({ error: "No value key in body" });
 
@@ -110,7 +113,7 @@ user_router.delete(
       new Date(),
       { userid: req.params["userid"], body: json_body },
     );
-    const user_data = await fetch_user(req.params["userid"]);
+    const user_data = await fetchUser(req.params["userid"]);
 
     if (json_body.key == null)
       return res.status(400).json({ error: "No key key in guild data" });
@@ -131,7 +134,7 @@ user_router.post("/create", async (req: Request, res: Response) => {
     new Date(),
     { body: json_body },
   );
-  const guild_data = await fetch_user(json_body.userID);
+  const guild_data = await fetchUser(json_body.userID);
   if (guild_data != null)
     return res.status(400).json({ error: "User already exists" });
 
@@ -143,7 +146,7 @@ user_router.post("/create", async (req: Request, res: Response) => {
   )
     return res.status(400).json({ error: "Missing parameters" });
 
-  const new_user_data = await create_user(
+  const new_user_data = await createUser(
     json_body.userID,
     json_body.serverID,
     json_body.lastMessageTimestamp,
