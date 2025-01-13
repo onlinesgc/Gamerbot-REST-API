@@ -1,62 +1,60 @@
-import { Schema, model } from 'mongoose'
-import { fetchTokenProfileByToken } from './token_schema'
+import { Schema, model } from "mongoose";
+import { fetchTokenProfileByToken } from "./token_schema";
 
-const token_log_profile_schema = new Schema({
-    token_id: { type: Number, require: true },
-    request_type: { type: String, require: true },
-    request_timestamp: { type: Date, require: true },
-    request_data: { type: Object, require: true },
-})
+const tokenLogProfileSchema = new Schema({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  token_id: { type: Number, require: true },
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  request_type: { type: String, require: true },
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  request_timestamp: { type: Date, require: true },
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  request_data: { type: Object, require: true },
+});
 
-const token_log_model = model('tokenLogModel', token_log_profile_schema)
+const tokenLogModel = model("tokenLogModel", tokenLogProfileSchema);
 
-/**
- * fetch token
- * @param id user id
- * @returns token profile
- */
 export const fetchTokenLogProfile = async (id: string) => {
-    const tokenLogData = await token_log_model.findOne({
-        token_id: { $eq: id },
-    })
-    if (!tokenLogData) return null
-    else return tokenLogData
-}
-/**
- * create token log
- * @param token
- * @param request_type
- * @param request_timestamp
- * @param request_data
- * @returns token log data
- */
+  const tokenLogData = await tokenLogModel.findOne({
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    token_id: { $eq: id },
+  });
+  if (!tokenLogData) return null;
+  else return tokenLogData;
+};
+
 export const createTokenLog = async (
-    token_headers: string,
-    request_type: string,
-    request_timestamp: Date,
-    request_data: object,
+  tokenHeaders: string,
+  requestType: string,
+  requestTimestamp: Date,
+  requestData: object,
 ) => {
-    const key = token_headers.split(' ')[1]
-    return await _createTokenLog(
-        (await fetchTokenProfileByToken(key))?.token_id as number,
-        request_type,
-        request_timestamp,
-        request_data,
-    )
-}
+  const key = tokenHeaders.split(" ")[1];
+  return await _createTokenLog(
+    (await fetchTokenProfileByToken(key))?.token_id as number,
+    requestType,
+    requestTimestamp,
+    requestData,
+  );
+};
+
 const _createTokenLog = async (
-    token_id: number,
-    request_type: string,
-    request_timestamp: Date,
-    request_data: object,
+  tokenId: number,
+  requestType: string,
+  requestTimestamp: Date,
+  requestData: object,
 ) => {
-    //Log system is off until further investigation in how to make it work with a bot that spams requests
-    return;
-    const tokenLogData = await token_log_model.create({
-        token_id: token_id,
-        request_type: request_type,
-        request_timestamp: request_timestamp,
-        request_data: request_data,
-    })
-    return tokenLogData
-}
+  //Log system is off until further investigation in how to make it work with a bot that spams requests
+  return;
+  const tokenLogData = await tokenLogModel.create({
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    token_id: tokenId,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    request_type: requestType,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    request_timestamp: requestTimestamp,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    request_data: requestData,
+  });
+  return tokenLogData;
+};
