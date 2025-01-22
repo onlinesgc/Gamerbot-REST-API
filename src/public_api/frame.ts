@@ -37,6 +37,13 @@ public_frame_router.post("/generate", async (req: Request, res: Response) => {
     fs.mkdirSync(cache_path);
   }
 
+  //temp guild id
+  const guildConfig = await fetch_guild_config("516605157795037185");
+
+  // eslint-disable-next-line
+  if (json_body.frame_id > (guildConfig?.frameConfig as any).length - 1)
+    return res.status(400).json({ error: "Invalid frame id" });
+
   const user_id = sanitize(json_body.userid);
 
   if (
