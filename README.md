@@ -3,6 +3,7 @@
 This is going to be a layer between SGC applications and the database to streamline the process and use fewer connections to the database.
 
 # Public routes
+
 Here is a wiki on how to use them
 
 https://github.com/onlinesgc/Gamerbot-REST-API/wiki
