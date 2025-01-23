@@ -45,6 +45,7 @@ const userSchema = new Schema({
 const userModel = model("ProfileModels", userSchema);
 
 export const fetchUser = async (userId: string) => {
+  if (!userId) return null;
   const profileData = await userModel.findOne({ userID: { $eq: userId } });
   if (!profileData) return null;
   if (profileData.hashed_email == undefined) profileData.hashed_email = "";
