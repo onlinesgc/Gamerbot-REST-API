@@ -8,7 +8,7 @@ import { startMongoConnection } from "./models/startup";
 import { fetchTokenProfileByToken } from "./models/token_schema";
 import { public_frame_router } from "./public_api/frame";
 import { publicUserRouter } from "./public_api/user";
-import { cors } from "cors";
+import cors from "cors";
 import logger from "./utils/logger";
 
 //Create express app
