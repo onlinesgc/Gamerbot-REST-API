@@ -69,6 +69,8 @@ user_router.post("/:userid", async (req: Request, res: Response) => {
 
   const user_data = await fetchUser(req.params["userid"]);
 
+  if (!user_data) return res.status(400).json({ error: "No user data" });
+
   //update given keys.
   for (const key in json_body) {
     if (user_data?.get(key) == null)
