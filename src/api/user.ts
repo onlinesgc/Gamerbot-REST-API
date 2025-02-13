@@ -81,7 +81,7 @@ user_router.post("/:userid", async (req: Request, res: Response) => {
   }
 
   res.json({ message: "Updated user data" });
-  user_data?.save();
+  await user_data.save();
 });
 
 //POST /api/user/:userid/add_obj
@@ -95,11 +95,14 @@ user_router.post("/:userid/add_obj", async (req: Request, res: Response) => {
     { userid: req.params["userid"], body: json_body },
   );
   const user_data = await fetchUser(req.params["userid"]);
+
+  if (!user_data) return res.status(400).json({ error: "No user data" });
+
   if (json_body.value == null || json_body.key == null)
     return res.status(400).json({ error: "No value key in body" });
 
-  user_data?.extraObjects.set(json_body.key, json_body.value);
-  user_data?.save();
+  user_data.extraObjects.set(json_body.key, json_body.value);
+  await user_data.save();
   res.json(user_data?.toJSON());
 });
 

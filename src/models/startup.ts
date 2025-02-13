@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 /**
  * connect to mongo database
  */
