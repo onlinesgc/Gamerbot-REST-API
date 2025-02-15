@@ -63,7 +63,8 @@ public_frame_router.post("/generate", async (req: Request, res: Response) => {
     const fiels = fs.readdirSync(cache_path);
     if (fiels.length > 100) {
       const id = (config.cacheQueue as unknown as string[]).shift();
-      fs.rmSync(`${cache_path}/${id}.png`);
+      if (fs.existsSync(`${cache_path}/${id}.png`))
+        fs.rmSync(`${cache_path}/${id}.png`);
     }
 
     fs.writeFileSync(`${cache_path}/${user_id}.png`, photo);
