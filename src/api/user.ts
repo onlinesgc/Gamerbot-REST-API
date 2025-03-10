@@ -29,7 +29,7 @@ user_router.get("/:userid", async (req: Request, res: Response) => {
 
   if (!guild_data) return res.status(400).json({ error: "No guild data" });
 
-  return res.json(guild_data.toJSON());
+  return res.json(await filter_model_json(guild_data.toJSON()));
 });
 
 //POST /api/user/fetch_many
@@ -52,7 +52,9 @@ user_router.post("/fetch_many", async (req: Request, res: Response) => {
       ? await fetchAll(json_body.filter)
       : await fetchAll(json_body.filter, json_body.maxUsers);
 
-  res.json(users);
+  res.json(
+    await Promise.all(users.map((user) => filter_model_json(user.toJSON()))),
+  );
 });
 
 //POST /api/user/:userid
@@ -159,5 +161,17 @@ user_router.post("/create", async (req: Request, res: Response) => {
   );
   res.json(new_user_data?.toJSON());
 });
+
+//eslint-disable-next-line
+const filter_model_json = async (json: any) => {
+  const jsonData = {};
+  await Promise.all(
+    Object.entries(json).map(async ([key, value]) => {
+      //eslint-disable-next-line
+      if (!key.startsWith("_")) (jsonData as any)[key] = value;
+    }),
+  );
+  return jsonData;
+};
 
 export { user_router };
