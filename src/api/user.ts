@@ -73,17 +73,13 @@ user_router.post("/:userid", async (req: Request, res: Response) => {
 
   if (!user_data) return res.status(400).json({ error: "No user data" });
 
-  //update given keys.
-  for (const key in json_body) {
-    if (user_data?.get(key) == null)
-      return res
-        .status(400)
-        .json({ error: `no ${key} key was found in the user data` });
-    user_data.set(key, json_body[key]);
-  }
+  if (json_body == null)
+    return res.status(400).json({ error: "No body key in body" });
+
+  if (!update_user_data(user_data, json_body))
+    return res.status(400).json({ error: "Invalid key in body" });
 
   res.json({ message: "Updated user data" });
-  await user_data.save();
 });
 
 //POST /api/user/:userid/add_obj
@@ -172,6 +168,18 @@ const filter_model_json = async (json: any) => {
     }),
   );
   return jsonData;
+};
+//eslint-disable-next-line
+const update_user_data = async (user_data: any, json_body: any) => {
+  //update given keys.
+  for (const key in json_body) {
+    if (user_data?.get(key) == null) return false;
+    user_data.set(key, json_body[key]);
+  }
+  await user_data.save().catch(async () => {
+    await update_user_data(user_data, json_body);
+  });
+  return true;
 };
 
 export { user_router };
