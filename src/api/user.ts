@@ -174,9 +174,11 @@ const update_user_data = async (user_data: any, json_body: any) => {
   //update given keys.
   for (const key in json_body) {
     if (user_data?.get(key) == null) return false;
+    if (key.startsWith("_")) continue;
     user_data.set(key, json_body[key]);
   }
   await user_data.save().catch(async () => {
+    user_data = await fetchUser(user_data.userID);
     await update_user_data(user_data, json_body);
   });
   return true;
