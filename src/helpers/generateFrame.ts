@@ -1,6 +1,7 @@
 import { createCanvas, Image, loadImage, registerFont } from "canvas";
 import path from "path";
 import { fetch_guild_config } from "../models/guild_schema";
+import { get_emojis } from "./emoji_counter_builder";
 
 export const generateFrame = async (
   name: string,
@@ -57,7 +58,7 @@ export const generateFrame = async (
 
   //writes level
   ctx.font = "40pt Sansumu 02";
-  ctx.fillText(`Level: ${level}`, width / 2, 470);
+  ctx.fillText(`📊: ${get_emojis(parseInt(level))}`, width / 2, 470);
 
   //renders xp bar
   const multiplier = 3.5;
@@ -70,7 +71,7 @@ export const generateFrame = async (
 
   //writes xp amount
   ctx.font = "40pt Sansumu 02";
-  ctx.fillText(`${xpPercentage}%`, width / 2, 600);
+  ctx.fillText(`${get_emojis(xpPercentage)}🧮`, width / 2, 600);
 
   //loads foreground frame if there is one
   if (foreground_frame_path != null) {
