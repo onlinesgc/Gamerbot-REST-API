@@ -3,7 +3,6 @@ import express, { NextFunction, Request, Response } from "express";
 import { rateLimit } from "express-rate-limit";
 import apiRouter from "./api";
 import KeyRequest from "./interfaces/KeyRequest";
-import prometheusMiddleware from "./middlewares/prometheus";
 import { startMongoConnection } from "./models/startup";
 import { fetchTokenProfileByToken } from "./models/token_schema";
 import { public_frame_router } from "./public_api/frame";
@@ -21,8 +20,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(cors());
-
-app.use(prometheusMiddleware);
 
 //Rate limiter for the API. Max 100 requests per 15 minutes. If the token is valid, the rate limit is not applied.
 app.use(
