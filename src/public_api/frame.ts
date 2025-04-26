@@ -34,7 +34,7 @@ publicFrameRouter.post("/generate", async (req: Request, res: Response) => {
   const guildConfig = await fetchGuildConfig("516605157795037185");
 
   if (frameId > guildConfig!.frames.length - 1)
-    return res.status(400).json({ error: "Invaild frame id" });
+    return res.status(400).json({ error: "Invalid frame id" });
 
   if (hexColor.length !== 7 || hexColor[0] !== "#")
     return res.status(400).json({ error: "Invaild hex color" });
