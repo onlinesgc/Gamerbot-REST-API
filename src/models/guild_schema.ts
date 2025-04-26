@@ -15,7 +15,7 @@ const guildConfigSchema = new Schema({
     trustedLinkRoles: { type: Array<string> },
     linkChannels: { type: Array<string> },
     whitelistedLinks: { type: Array<string> },
-    banedUsers: { type: Array<object> },
+    bannedUsers: { type: Array<object> },
     modLogChannelId: { type: String },
   },
   topics: { type: Array<string> },
