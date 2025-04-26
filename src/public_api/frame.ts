@@ -4,121 +4,130 @@ import path from "path";
 import sanitize from "sanitize-filename";
 import { generateFrame } from "../helpers/generateFrame";
 import { fetchConfig } from "../models/config_schema";
-import { fetch_guild_config } from "../models/guild_schema";
+import { fetchGuildConfig } from "../models/guild_schema";
 
-const public_frame_router = Router();
-public_frame_router.use(json());
+const publicFrameRouter = Router();
+publicFrameRouter.use(json());
 
-/*
- * POST /public_api/frame/generate
- * Returns the generated frame for the user
- */
-public_frame_router.post("/generate", async (req: Request, res: Response) => {
-  if (req.body == null) return res.status(400).json({ error: "Missing body" });
-  const json_body = req.body;
+//POST /public_api/frame/generate
+//Generates a frame
+publicFrameRouter.post("/generate", async (req: Request, res: Response) => {
+  if (req.body == null) return res.status(400).json({ error: "No body" });
+  const jsonBody = req.body;
   if (
-    json_body.userid == null ||
-    json_body.frame_id == null ||
-    json_body.hex_color == null ||
-    json_body.username == null ||
-    json_body.level == null ||
-    json_body.xp_percentage == null
+    jsonBody.userId == null ||
+    jsonBody.frameId == null ||
+    jsonBody.hexColor == null ||
+    jsonBody.username == null ||
+    jsonBody.level == null ||
+    jsonBody.xpPercentage == null
   )
-    return res.status(400).json({ error: "Missing fields" });
+    return res.status(400).json({ error: "Missing parameters" });
 
-  const config = await fetchConfig(process.env.API_CONFIG_ID as string);
+  const { userId, frameId, hexColor, username, level, xpPercentage } = jsonBody;
 
-  const member_avatar_url =
-    json_body.avatar_url != null ? json_body.avatar_url : null;
+  const memberAvatar = jsonBody.memberAvatar || null;
 
-  const cache_path = path.resolve("./cache");
+  const force = jsonBody.force || false;
 
-  if (!fs.existsSync(cache_path)) {
-    fs.mkdirSync(cache_path);
+  const config = await fetchConfig(process.env.API_CONFIG_ID!);
+  const guildConfig = await fetchGuildConfig("516605157795037185");
+
+  if (frameId > guildConfig!.frames.length - 1)
+    return res.status(400).json({ error: "Invaild frame id" });
+
+  if (hexColor.length !== 7 || hexColor[0] !== "#")
+    return res.status(400).json({ error: "Invaild hex color" });
+
+  const cachePath = path.join("./cache");
+  if (!fs.existsSync(cachePath)) {
+    fs.mkdirSync(cachePath);
   }
-
-  //temp guild id
-  const guildConfig = await fetch_guild_config("516605157795037185");
-
-  // eslint-disable-next-line
-  if (json_body.frame_id > (guildConfig?.frameConfig as any).length - 1)
-    return res.status(400).json({ error: "Invalid frame id" });
-
-  const user_id = sanitize(json_body.userid);
-
-  if (
-    !(config.cacheQueue as unknown as string[]).includes(user_id) ||
-    json_body?.force == true
-  ) {
-    const photo = await generateFrame(
-      json_body.username,
-      json_body.frame_id,
-      json_body.hex_color,
-      json_body.level,
-      json_body.xp_percentage,
-      member_avatar_url,
-    );
-    if (photo == null)
-      return res.status(500).json({ error: "Error generating photo" });
-    const fiels = fs.readdirSync(cache_path);
-    if (fiels.length > 100) {
-      const id = (config.cacheQueue as unknown as string[]).shift();
-      if (fs.existsSync(`${cache_path}/${id}.png`))
-        fs.rmSync(`${cache_path}/${id}.png`);
-    }
-
-    fs.writeFileSync(`${cache_path}/${user_id}.png`, photo);
-
-    if (!(config.cacheQueue as unknown as string[]).includes(user_id))
-      (config.cacheQueue as unknown as string[]).push(user_id);
-    config.save();
-  } else {
-    const check_file = fs.realpathSync(
-      path.resolve(cache_path, user_id + ".png"),
-    );
-    if (!check_file.startsWith(cache_path)) {
-      return res.status(400).json({ error: "Invalid path" });
-    }
-  }
-  res.sendFile(`${cache_path}/${json_body.userid}.png`);
-});
-
-/*
- * POST /public_api/frame/get/config
- * Returns the frame config for the given guild
- */
-public_frame_router.post("/get/config", async (req: Request, res: Response) => {
-  if (req.body == null) return res.status(400).json({ error: "Missing body" });
-  const json_body = req.body;
-  if (json_body.guildId == null)
-    return res.status(400).json({ error: "Missing fields" });
-
-  const guild_id = sanitize(json_body.guildId);
-  const config = await fetch_guild_config(guild_id);
-  // eslint-disable-next-line
-  let frame_config: any[] = config?.frameConfig as unknown as any[];
-  frame_config.map(
+  const cachedFrameObject = config?.cachedGeneratedFrames.find(
     (frame) =>
-      (frame.frameLink = `https://api.sgc.se/public_api/frame/get/${guild_id}/${frame.id}`),
+      frame.userId === userId &&
+      frame.frameId === frameId &&
+      frame.hexColor === hexColor &&
+      frame.username === username &&
+      frame.level === level &&
+      frame.xpPercentage === xpPercentage &&
+      frame.memberAvatar === memberAvatar,
   );
-  return res.json(frame_config);
+  if (cachedFrameObject && !force) {
+    const filePath = path.join(cachePath, `${sanitize(userId)}.png`);
+    if (fs.existsSync(filePath)) {
+      return res.download(filePath);
+    }
+  } else {
+    const oldIndex = config?.cachedGeneratedFrames.findIndex(
+      (frame) => frame.userId === userId,
+    );
+    if (oldIndex !== -1) {
+      config?.cachedGeneratedFrames.splice(oldIndex!, 1);
+    }
+  }
+  const filePath = path.join(cachePath, `${sanitize(userId)}.png`);
+  const framePhoto = await generateFrame(
+    username,
+    frameId,
+    hexColor,
+    level,
+    xpPercentage,
+    memberAvatar,
+  );
+  if (!framePhoto)
+    return res.status(500).json({ error: "Failed to generate frame" });
+
+  fs.writeFileSync(filePath, framePhoto);
+  config?.cachedGeneratedFrames.push({
+    userId: userId,
+    frameId: frameId,
+    hexColor: hexColor,
+    username: username,
+    level: level,
+    xpPercentage: xpPercentage,
+    memberAvatar: memberAvatar,
+  });
+  if (config!.cachedGeneratedFrames.length > 5) {
+    config?.cachedGeneratedFrames.shift();
+  }
+  await config?.save();
+  return res.download(filePath);
 });
 
-public_frame_router.get(
-  "/get/:guildId/:frameId",
-  async (req: Request, res: Response) => {
-    const guild_id = sanitize(req.params["guildId"]);
-    const frame_id = sanitize(req.params["frameId"]);
-    const config = await fetch_guild_config(guild_id);
-    // eslint-disable-next-line
-    const frame = (config?.frameConfig as unknown as Array<any>)[
-      parseInt(frame_id)
-    ];
-    if (frame == null)
-      return res.status(400).json({ error: "Invalid frame id" });
+//GET /public_api/frame/config
+//Returns the config for the frame
+publicFrameRouter.get("/config", async (req: Request, res: Response) => {
+  const config = await fetchConfig(process.env.API_CONFIG_ID!);
+  if (!config) return res.status(500).json({ error: "No config found" });
+  const guildConfig = await fetchGuildConfig("516605157795037185");
+  if (!guildConfig)
+    return res.status(500).json({ error: "No guild config found" });
+  const frameConfig = {
+    frames: guildConfig.frames,
+  };
+  return res.json(frameConfig);
+});
 
-    res.sendFile(path.resolve("./") + "/" + frame.path);
-  },
-);
+//GET /public_api/frame/:frameId
+//Returns the frame for the given frameId
+publicFrameRouter.get("/:frameId", async (req: Request, res: Response) => {
+  if (req.params["frameId"] == null)
+    return res.status(400).json({ error: "No frame ID" });
+  const frameId = parseInt(req.params["frameId"]);
+  if (isNaN(frameId))
+    return res.status(400).json({ error: "Invalid frame ID" });
+  const guildConfig = await fetchGuildConfig("516605157795037185");
+  if (!guildConfig)
+    return res.status(500).json({ error: "No guild config found" });
+  if (frameId > guildConfig.frames.length - 1)
+    return res.status(400).json({ error: "Invalid frame ID" });
+  const frame = guildConfig.frames[frameId];
+  if (!frame) return res.status(400).json({ error: "No frame with that ID" });
+  const filePath = path.resolve("./") + frame.path;
+  if (!fs.existsSync(filePath))
+    return res.status(400).json({ error: "No frame with that ID" });
+  res.download(filePath);
+});
 
-export { public_frame_router };
+export { publicFrameRouter };

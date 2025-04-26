@@ -1,59 +1,61 @@
 import { Schema, model } from "mongoose";
 
-const guild_config_schema = new Schema({
-  guildID: { type: String, require: true, unique: true },
-  privateVoiceChannel: { type: String, default: "" },
-  publicVoiceChannel: { type: String, default: "" },
-  infoVoiceChannel: { type: String, default: "" },
-  notificationChannel: { type: String, default: "" },
-  ticketParent: { type: String, default: "" },
-  archivedTicketParent: { type: String, default: "" },
-  allowedLinksChannels: { type: Array, default: [] },
-  trustedLinkRoles: { type: Array, default: [] },
-  xpBoostRoles: { type: Array, default: [] },
-  noXpChannels: { type: Array, default: [] },
-  whitelistedLinks: { type: Array, default: [] },
-  threedChannels: { type: Array, default: [] },
-  bansTimes: { type: Array },
-  topicList: { type: Array },
-  staffModlogs: { type: String },
-  sverokMails: { type: Array },
-  frameConfig: {
-    type: Array<object>,
-    default: [
-      {
-        name: "Default",
-        frameLink: "",
-        path: "",
-        id: 0,
-      },
-    ],
+const guildConfigSchema = new Schema({
+  guildId: { type: String, require: true, unique: true },
+  voiceChannelData: {
+    voiceChannelId: { type: String },
+    infoChatId: { type: String },
   },
-  extraObjects: { type: Map, default: {} },
+  ticketData: {
+    ticketCategoryId: { type: String },
+    archivedTicketCategoryId: { type: String },
+  },
+  autoModeration: {
+    linkFilter: { type: Boolean, default: false },
+    trustedLinkRoles: { type: Array<string> },
+    linkChannels: { type: Array<string> },
+    whitelistedLinks: { type: Array<string> },
+    banedUsers: { type: Array<object> },
+    modLogChannelId: { type: String },
+  },
+  topics: { type: Array<string> },
+  noXpChannels: { type: Array, default: [] },
+  frames: [
+    {
+      name: { type: String },
+      path: { type: String },
+      id: { type: Number },
+    },
+  ],
+  extraObjects: {
+    type: Map,
+    of: Object,
+  },
 });
 
-const guild_model = model("GuildConfig", guild_config_schema);
+const guildModel = model("GuildConfig", guildConfigSchema);
 
 /**
- * Fetch guild config
- * @param guild_ID guild id
- * @returns
+ * fetches a guild config from the database.
+ * If the guild config does not exist, it creates a new guild config.
+ * @param guildId - The ID of the guild to fetch.
+ * @returns The guild config object.
  */
-const fetch_guild_config = async (guild_ID: string) => {
-  const data = await guild_model.findOne({ guildID: { $eq: guild_ID } });
-  if (data == null) return null;
-  return data;
-};
-/**
- * create guild config
- * @param guild_ID guild id
- */
-const create_guild_config = async (guild_ID: string) => {
-  const data = await guild_model.create({
-    guildID: guild_ID,
-  });
-  await data.save();
-  return data;
+const fetchGuildConfig = async (guildId: string) => {
+  if (!guildId) return null;
+  const guildConfig = await guildModel.findOne({ guildId: guildId });
+  if (!guildConfig) return createGuildConfig(guildId);
+  return guildConfig;
 };
 
-export { create_guild_config, fetch_guild_config, guild_model };
+/**
+ * Creates a new guild config in the database.
+ * @param guildId - The ID of the guild to create.
+ * @returns The created guild config object.
+ * */
+const createGuildConfig = async (guildId: string) => {
+  const guildConfig = await guildModel.create({ guildId: guildId });
+  return guildConfig;
+};
+
+export { guildModel, fetchGuildConfig, createGuildConfig };

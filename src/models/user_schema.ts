@@ -1,94 +1,90 @@
 import { Schema, model, sanitizeFilter } from "mongoose";
 
 const userSchema = new Schema({
-  userID: { type: String, require: true, unique: true },
-  serverID: { type: String, require: true },
-  xp: { type: Number, default: 0 },
-  lastMessageTimestamp: { type: Number },
-  xpTimeoutUntil: { type: Number },
-  level: { type: Number },
-  reminders: { type: Array },
-  colorHexCode: { type: String },
-  privateVoiceID: { type: String, default: "" },
-  privateVoiceThreadID: { type: String, default: "" },
-  profileFrame: { type: String },
-  hasLeftTicket: { type: Boolean },
-  xpboost: {
-    type: Object,
-    default: {
-      multiplier: 1,
-      stopBoostTimestamp: null,
+  userId: { type: String, require: true, unique: true },
+  levelSystem: {
+    level: { type: Number, default: 0 },
+    xp: { type: Number, default: 0 },
+    xpTimeoutUntil: { type: Number },
+    lastMessageTimestamp: { type: Number },
+    oldMessages: { type: Array<string> },
+  },
+  frameData: {
+    frameColorHexCode: { type: String, default: "#787C75" },
+    selectedFrame: { type: Number, default: 0 },
+    frames: {
+      type: Array<string>,
+      default: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
     },
   },
-  exclusiveFrames: { type: Array },
-  other: {
-    type: Object,
-    default: {
-      hasHallowenFrame: false,
-    },
+  voiceData: {
+    voiceChannelId: { type: String },
+    voiceChannelThreadId: { type: String },
   },
-  modLogs: { type: Array },
-  hasCheckedInSverok: { type: Boolean, default: false },
-  // Parkour WhiteList
-  minecraftWhiteList: { type: Boolean, default: false },
-  minecraftUsername: { type: String },
-  minecraftUuid: { type: String },
-  minecraftSecretCode: { type: String },
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  old_messages: { type: Array },
-  cachedImageLink: { type: String },
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  hashed_email: { type: String },
-  extraObjects: { type: Map, default: {} },
+  modLogs: {
+    type: Array<object>,
+  },
+  minecraftData: {
+    uuid: { type: String },
+    username: { type: String },
+  },
+  extraObjects: {
+    type: Map,
+    of: Object,
+  },
+  hashedEmail: { type: String },
+  reminders: { type: Array<string> },
 });
 
-const userModel = model("ProfileModels", userSchema);
+const userModel = model("Users", userSchema);
 
-export const fetchUser = async (userId: string) => {
+/**
+ * Fetches a user from the database.
+ * If the user does not exist, it creates a new user.
+ * @param userId - The ID of the user to fetch.
+ * @returns The user object.
+ */
+const fetchUser = async (userId: string, createOnFail = true) => {
   if (!userId) return null;
-  const profileData = await userModel.findOne({ userID: { $eq: userId } });
-  if (!profileData) return null;
-  if (profileData.hashed_email == undefined) profileData.hashed_email = "";
-  return profileData;
+  const user = await userModel.findOne({ userId: userId });
+  if (!user && createOnFail) return createUser(userId);
+  if (!user) return null;
+  return user;
 };
 
-export const createUser = async (
-  userId: string,
-  serverId: string,
-  lastMessageTimestamp = 0,
-  xpTimeoutUntil = 0,
-  colorHexCode = "#787C75",
-  profileFrame = 0,
-) => {
-  const profileData = await userModel.create({
-    userID: userId,
-    serverID: serverId,
-    xp: 0,
-    lastMessageTimestamp: lastMessageTimestamp,
-    xpTimeoutUntil: xpTimeoutUntil,
-    level: 1,
-    reminders: [],
-    colorHexCode: colorHexCode,
-    profileFrame: profileFrame,
-    exclusiveFrames: [],
-    minecraftUsername: null,
-    minecraftUuid: null,
-    minecraftSecretCode: null,
-  });
-  await profileData.save();
-  return profileData;
+/**
+ * Creates a new user in the database.
+ * @param userId - The ID of the user to create.
+ * @returns The created user object.
+ */
+const createUser = async (userId: string) => {
+  const user = await userModel.create({ userId: userId });
+  user.levelSystem!.lastMessageTimestamp = Date.now();
+  user.levelSystem!.xpTimeoutUntil = Date.now();
+  await user.save();
+  return user;
 };
 
-export const fetchAll = async (filter: object, maxUsers = -1) => {
-  filter = sanitizeFilter(filter) || {};
-
-  const profiles =
-    maxUsers != -1
-      ? userModel
-          .find(filter)
-          .sort({ level: -1 })
-          .sort({ xp: -1 })
-          .limit(maxUsers)
-      : userModel.find(filter).sort({ level: -1 }).sort({ xp: -1 });
-  return profiles;
+/**
+ * Fetches all users from the database.
+ * @param filter - The filter to apply to the query.
+ * @param maxUser - The maximum number of users to fetch. Default is -1 (no limit).
+ * @returns An array of user objects.
+ */
+const fetchAllUsers = async (filter: object, maxUser = -1) => {
+  const sanitizedFilter = sanitizeFilter(filter) || {};
+  if (maxUser == -1) {
+    return await userModel
+      .find(sanitizedFilter)
+      .sort({ ["levelSystem.level"]: -1 })
+      .sort({ ["levelSystem.xp"]: -1 });
+  } else {
+    return await userModel
+      .find(sanitizedFilter)
+      .sort({ ["levelSystem.level"]: -1 })
+      .sort({ ["levelSystem.xp"]: -1 })
+      .limit(maxUser);
+  }
 };
+
+export { userModel, fetchUser, createUser, fetchAllUsers };

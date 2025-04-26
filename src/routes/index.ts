@@ -1,9 +1,9 @@
 import { NextFunction, Response, Router } from "express";
 import KeyRequest from "../interfaces/KeyRequest";
 import { fetchTokenProfileByToken } from "../models/token_schema";
-import { config_router } from "./config";
+import { configRouter } from "./config";
 import { guildRouter } from "./guild";
-import { user_router } from "./user";
+import { userRouter } from "./user";
 
 const apiRouter = Router();
 
@@ -19,8 +19,8 @@ apiRouter.use(async (req: KeyRequest, res: Response, next: NextFunction) => {
   next();
 });
 
-apiRouter.use("/config", config_router);
+apiRouter.use("/config", configRouter);
 apiRouter.use("/guild", guildRouter);
-apiRouter.use("/user", user_router);
+apiRouter.use("/user", userRouter);
 
 export default apiRouter;
