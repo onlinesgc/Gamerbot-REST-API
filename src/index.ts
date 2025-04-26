@@ -1,11 +1,11 @@
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import { rateLimit } from "express-rate-limit";
-import apiRouter from "./api";
+import apiRouter from "./routes";
 import KeyRequest from "./interfaces/KeyRequest";
 import { startMongoConnection } from "./models/startup";
 import { fetchTokenProfileByToken } from "./models/token_schema";
-import { public_frame_router } from "./public_api/frame";
+import { publicFrameRouter } from "./public_api/frame";
 import { publicUserRouter } from "./public_api/user";
 import cors from "cors";
 import logger from "./utils/logger";
@@ -31,7 +31,7 @@ app.use(
     skip: async (req: KeyRequest) =>
       (await fetchTokenProfileByToken(
         req.headers["authorization"]?.split(" ")[1] as string,
-      )) != null, //skip if the token is valid, otherwise apply rate limit to the ta;
+      )) != null, //skip if the token is valid, otherwise apply rate limit.
   }),
 );
 
@@ -39,7 +39,7 @@ app.use("/api", apiRouter);
 
 //public api
 app.use("/public_api/user", publicUserRouter);
-app.use("/public_api/frame", public_frame_router);
+app.use("/public_api/frame", publicFrameRouter);
 
 //root endpoint
 app.get("/", (req: Request, res: Response) => {

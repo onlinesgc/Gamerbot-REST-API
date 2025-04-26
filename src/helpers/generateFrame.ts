@@ -1,26 +1,26 @@
 import { createCanvas, Image, loadImage, registerFont } from "canvas";
 import path from "path";
-import { fetch_guild_config } from "../models/guild_schema";
+import { fetchGuildConfig } from "../models/guild_schema";
 
 export const generateFrame = async (
   name: string,
   frame: number,
-  hex_color: string,
+  hexColor: string,
   level: string,
   xpPercentage: number,
-  member_avatar_url: string,
+  memberAvatar: string,
   guildId = "516605157795037185",
 ) => {
-  const guildConfig = await fetch_guild_config(guildId);
-  if (!guildConfig?.frameConfig) return;
+  const guildConfig = await fetchGuildConfig(guildId);
+  if (!guildConfig?.frames) return;
 
   //eslint-disable-next-line
-  const frame_config = guildConfig.frameConfig as unknown as Array<any>;
-  const frame_path = path.resolve("./") + "/" + frame_config[frame].path;
-  if (frame_path == undefined) return null;
-  const foreground_frame_path =
-    frame_config[frame].foregroundPath != undefined
-      ? frame_config[frame].foregroundPath
+  const frames = guildConfig.frames as unknown as Array<any>;
+  const framePath = path.resolve("./") + "/" + frames[frame].path;
+  if (framePath == undefined) return null;
+  const foregroundFramePath =
+    frames[frame].foregroundPath != undefined
+      ? frames[frame].foregroundPath
       : null;
 
   const width = 500;
@@ -35,16 +35,16 @@ export const generateFrame = async (
   const ctx = canvas.getContext("2d");
 
   //background color
-  ctx.fillStyle = hex_color;
+  ctx.fillStyle = hexColor;
   ctx.fillRect(0, 0, width, height);
   //Loads frame
-  await loadImage(frame_path).then((img: Image) =>
+  await loadImage(framePath).then((img: Image) =>
     ctx.drawImage(img, 0, 0, width, height),
   );
 
   //loads avatar
-  if (member_avatar_url != null) {
-    await loadImage(member_avatar_url).then((img: Image) =>
+  if (memberAvatar != null) {
+    await loadImage(memberAvatar).then((img: Image) =>
       ctx.drawImage(img, width / 2 - 125, 80, 250, 250),
     );
   }
@@ -73,8 +73,8 @@ export const generateFrame = async (
   ctx.fillText(`${xpPercentage}%`, width / 2, 600);
 
   //loads foreground frame if there is one
-  if (foreground_frame_path != null) {
-    await loadImage(foreground_frame_path).then((img: Image) =>
+  if (foregroundFramePath != null) {
+    await loadImage(foregroundFramePath).then((img: Image) =>
       ctx.drawImage(img, 0, 0, width, height),
     );
   }
