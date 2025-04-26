@@ -37,7 +37,7 @@ publicFrameRouter.post("/generate", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Invalid frame id" });
 
   if (hexColor.length !== 7 || hexColor[0] !== "#")
-    return res.status(400).json({ error: "Invaild hex color" });
+    return res.status(400).json({ error: "Invalid hex color" });
 
   const cachePath = path.join("./cache");
   if (!fs.existsSync(cachePath)) {
