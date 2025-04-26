@@ -64,6 +64,7 @@ publicFrameRouter.post("/generate", async (req: Request, res: Response) => {
     );
     if (oldIndex !== -1) {
       config?.cachedGeneratedFrames.splice(oldIndex!, 1);
+      fs.rmSync(path.join(cachePath, `${sanitize(userId)}.png`));
     }
   }
   const filePath = path.join(cachePath, `${sanitize(userId)}.png`);
@@ -89,7 +90,9 @@ publicFrameRouter.post("/generate", async (req: Request, res: Response) => {
     memberAvatar: memberAvatar,
   });
   if (config!.cachedGeneratedFrames.length > 5) {
-    config?.cachedGeneratedFrames.shift();
+    const removedFrame = config?.cachedGeneratedFrames.shift();
+    if (removedFrame)
+      fs.rmSync(path.join(cachePath, `${sanitize(removedFrame.userId!)}.png`));
   }
   await config?.save();
   return res.download(filePath);
