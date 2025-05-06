@@ -19,7 +19,7 @@ https://github.com/onlinesgc/Gamerbot-REST-API/wiki
   2. Create an new project
   3. Create an new cluster in the project
   4. It will ask you to create an login, do it and save down the password and username
-  5. When they ask you were you are going to use cluster, press node.js.
+  5. When they ask you were you are going to use the cluster, press node.js.
   6. You will now see a string that looks somting like this `mongodb+srv://<Username>:<password>@<clustername>....`. Save this link
 
 ### Setup

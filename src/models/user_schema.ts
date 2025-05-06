@@ -29,11 +29,10 @@ const userSchema = new Schema({
     username: { type: String },
   },
   extraObjects: {
-    type: Map,
-    of: Object,
+    type: Map<string, object>,
   },
   hashedEmail: { type: String },
-  reminders: { type: Array<string> },
+  reminders: { type: Array<object> },
 });
 
 const userModel = model("Users", userSchema);

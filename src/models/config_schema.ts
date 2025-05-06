@@ -24,7 +24,8 @@ const configSchema = new Schema({
       memberAvatar: { type: String },
     },
   ],
-  extraobjects: { type: Map, of: Object },
+  debugGuildId: { type: String },
+  extraobjects: { type: Map<string, object> },
 });
 
 const configModel = model("Config", configSchema);

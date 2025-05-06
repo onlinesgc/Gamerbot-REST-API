@@ -28,8 +28,7 @@ const guildConfigSchema = new Schema({
     },
   ],
   extraObjects: {
-    type: Map,
-    of: Object,
+    type: Map<string, object>,
   },
 });
 
