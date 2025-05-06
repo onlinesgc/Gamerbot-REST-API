@@ -177,7 +177,9 @@ const update_user_data = async (user_data: any, json_body: any) => {
     if (key.startsWith("_")) continue;
     user_data.set(key, json_body[key]);
   }
-  await user_data.save();
+  await user_data.save().catch((error: unknown) => {
+    console.error("Error saving user data:", error);
+  });
   return true;
 };
 
