@@ -6,17 +6,17 @@ import tseslint from "typescript-eslint";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { files: ["**/*.{js,mjs,cjs,ts}"] },
-  { ignores: ["**/dist/*"] },
-  { languageOptions: { globals: globals.node } },
-  { plugins: { tseslint } },
-  {
-    rules: {
-      "@typescript-eslint/naming-convention": "warn",
+    { files: ["**/*.{js,mjs,cjs,ts}"] },
+    { ignores: ["**/dist/*"] },
+    { languageOptions: { globals: globals.node } },
+    { plugins: { tseslint } },
+    {
+        rules: {
+            "@typescript-eslint/naming-convention": "warn",
+        },
     },
-  },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  ...tseslint.configs.stylistic,
-  eslintPluginPrettierRecommended,
+    eslint.configs.recommended,
+    ...tseslint.configs.recommended,
+    ...tseslint.configs.stylistic,
+    eslintPluginPrettierRecommended,
 ];

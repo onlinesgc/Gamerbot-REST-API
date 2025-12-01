@@ -12,15 +12,15 @@ https://github.com/onlinesgc/Gamerbot-REST-API/wiki
 
 ### Prerequisite to run the API
 
-- [NodeJS](https://nodejs.org/en).
-- A package manager. I use [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-- A Mongodb cluster. (Instructions below)
-  1. Make an account on [MongoDB](https://www.mongodb.com/developer/)
-  2. Create an new project
-  3. Create an new cluster in the project
-  4. It will ask you to create an login, do it and save down the password and username
-  5. When they ask you were you are going to use the cluster, press node.js.
-  6. You will now see a string that looks somting like this `mongodb+srv://<Username>:<password>@<clustername>....`. Save this link
+-   [NodeJS](https://nodejs.org/en).
+-   A package manager. I use [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+-   A Mongodb cluster. (Instructions below)
+    1. Make an account on [MongoDB](https://www.mongodb.com/developer/)
+    2. Create an new project
+    3. Create an new cluster in the project
+    4. It will ask you to create an login, do it and save down the password and username
+    5. When they ask you were you are going to use the cluster, press node.js.
+    6. You will now see a string that looks somting like this `mongodb+srv://<Username>:<password>@<clustername>....`. Save this link
 
 ### Setup
 

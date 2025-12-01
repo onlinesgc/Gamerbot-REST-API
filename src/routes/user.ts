@@ -1,5 +1,5 @@
 import { Request, Response, Router, json } from "express";
-import { fetchAllUsers, fetchUser } from "../models/user_schema";
+import { fetchAllUsers, fetchUser, updateUser } from "../models/userSchema";
 
 const userRouter = Router();
 userRouter.use(json());
@@ -7,68 +7,41 @@ userRouter.use(json());
 //GET /api/user/:userid
 //Returns the user data for the given userid
 userRouter.get("/:userid", async (req: Request, res: Response) => {
-  const guildData = await fetchUser(req.params["userid"]);
+    const guildData = await fetchUser(req.params["userid"]);
 
-  if (!guildData) return res.status(400).json({ error: "No guild data" });
+    if (!guildData) return res.status(400).json({ error: "No guild data" });
 
-  return res.json(await filterModelJson(guildData.toJSON()));
+    return res.json(guildData.toJSON());
 });
 
 //POST /api/user/fetch_many
 //Returns the user data for the given filter
 userRouter.post("/fetch_many", async (req: Request, res: Response) => {
-  const jsonBody = req.body;
+    const jsonBody = req.body;
 
-  if (jsonBody.filter == null)
-    return res.status(400).json({ error: "No filter key in body" });
+    if (jsonBody.filter == null)
+        return res.status(400).json({ error: "No filter key in body" });
 
-  const users =
-    jsonBody.maxUsers == null
-      ? await fetchAllUsers(jsonBody.filter)
-      : await fetchAllUsers(jsonBody.filter, jsonBody.maxUsers);
+    const users =
+        jsonBody.maxUsers == null
+            ? await fetchAllUsers(jsonBody.filter)
+            : await fetchAllUsers(jsonBody.filter, jsonBody.maxUsers);
 
-  res.json(
-    await Promise.all(users.map((user) => filterModelJson(user.toJSON()))),
-  );
+    res.json(await Promise.all(users.map((user) => user.toJSON())));
 });
 
 //POST /api/user/:userid
 //Updates the user data for the given userid
 userRouter.post("/:userid", async (req: Request, res: Response) => {
-  const jsonBody = req.body;
+    const jsonBody = req.body;
 
-  const userData = await fetchUser(req.params["userid"]);
+    const userData = await updateUser(req.params["userid"], jsonBody);
 
-  if (jsonBody == null)
-    return res.status(400).json({ error: "No body key in body" });
+    if (!userData) {
+        return res.status(400).json({ error: "Failed to update user data" });
+    }
 
-  if (!updateUserData(userData, jsonBody))
-    return res.status(400).json({ error: "Invalid key in body" });
-
-  res.json({ message: "Updated user data" });
+    res.json(userData.toJSON());
 });
-
-const filterModelJson = async (json: object) => {
-  const jsonData = {};
-  await Promise.all(
-    Object.entries(json).map(async ([key, value]) => {
-      //eslint-disable-next-line
-      if (!key.startsWith("_")) (jsonData as any)[key] = value;
-    }),
-  );
-  return jsonData;
-};
-
-//eslint-disable-next-line
-const updateUserData = async (userData: any, jsonBody: any) => {
-  //update given keys.
-  for (const key in jsonBody) {
-    if (userData?.get(key) == null) return false;
-    if (key.startsWith("_")) continue;
-    userData.set(key, jsonBody[key]);
-  }
-  await userData.save();
-  return true;
-};
 
 export { userRouter };
