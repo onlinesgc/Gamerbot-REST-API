@@ -67,7 +67,7 @@ export type GuildConfigDocument = HydratedDocument<GuildConfig>;
  * @returns The guild config object.
  */
 export const fetchGuildConfig = async (guildId: string) => {
-    if (!guildId) return null;
+    if (!guildId || typeof guildId !== "string") return null;
     const guildConfig = await guildModel.findOne({ guildId: guildId });
     if (!guildConfig) return createGuildConfig(guildId);
     return guildConfig;
@@ -79,6 +79,7 @@ export const fetchGuildConfig = async (guildId: string) => {
  * @returns The created guild config object.
  * */
 export const createGuildConfig = async (guildId: string) => {
+    if (!guildId || typeof guildId !== "string") return null;
     const guildConfig = await guildModel.create({ guildId: guildId });
     return guildConfig;
 };
