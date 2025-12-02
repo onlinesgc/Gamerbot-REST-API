@@ -49,6 +49,13 @@ publicFrameRouter.post("/generate", async (req: Request, res: Response) => {
         return res.status(500).json({ error: "Failed to generate frame" });
     if (cachedId) {
         cachedFrames.set(cachedId, frameBuffer);
+        if (cachedFrames.size > 100) {
+            // Limit cache size to 100
+            const firstKey = cachedFrames.keys().next().value;
+            if (firstKey) {
+                cachedFrames.delete(firstKey);
+            }
+        }
     }
     res.setHeader("Content-Type", "image/png");
     res.send(frameBuffer);
