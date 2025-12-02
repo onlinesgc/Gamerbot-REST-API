@@ -48,5 +48,6 @@ app.get("/", (req: Request, res: Response) => {
 
 app.listen(port, async () => {
     await startMongoConnection();
+    //moveData();
     logger.info(`Listening on port ${port}`);
 });

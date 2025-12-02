@@ -70,11 +70,30 @@ const remiderSchema = new Schema(
 
 const userSchema = new Schema({
     userId: { type: String, require: true, unique: true },
-    levelSystem: { type: levelSystemSchema },
-    frameData: { type: frameDataSchema },
-    voiceData: { type: voiceDataSchema },
+    levelSystem: {
+        type: levelSystemSchema,
+        default: () => ({
+            level: 0,
+            xp: 0,
+            xpTimeoutUntil: Date.now(),
+            lastMessageTimestamp: Date.now(),
+            oldMessages: [],
+        }),
+    },
+    frameData: {
+        type: frameDataSchema,
+        default: () => ({
+            frameColorHexCode: "#787C75",
+            selectedFrame: 0,
+            frames: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+        }),
+    },
+    voiceData: {
+        type: voiceDataSchema,
+        default: () => ({}),
+    },
     modLogs: { type: [modLogSchema], default: [] },
-    minecraftData: { type: minecraftDataSchema },
+    minecraftData: { type: minecraftDataSchema, default: () => ({}) },
     hashedEmail: { type: String },
     reminders: { type: [remiderSchema], default: [] },
     extraObjects: {

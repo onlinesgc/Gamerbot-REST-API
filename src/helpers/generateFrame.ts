@@ -1,6 +1,7 @@
 import { createCanvas, Image, loadImage, registerFont } from "canvas";
 import path from "path";
 import { fetchGuildConfig } from "../models/guildSchema";
+import fs from "fs";
 
 export const generateFrame = async (
     name: string,
@@ -20,16 +21,17 @@ export const generateFrame = async (
 
     if (!frameData) return null;
 
-    const framePath = path.resolve("./" + frameData.path);
-    if (framePath == undefined) return null;
+    const framePath = path.resolve("./" + frameData.path) || null;
+    if (!framePath) return null;
     const foregroundFramePath = frameData.foregroundPath || null;
 
     const width = 500;
     const height = 800;
 
     //INFO: Don't work on windows
-    registerFont(path.resolve("./graphics/fonts/Sansumu02-Regular.ttf"), {
-        family: "Sansumu 02",
+    const fontPath = path.resolve("./graphics/fonts/Sansumu02-Regular.ttf");
+    registerFont(fontPath, {
+        family: "Sansumu",
     });
 
     const canvas = createCanvas(width, height);
@@ -39,26 +41,30 @@ export const generateFrame = async (
     ctx.fillStyle = hexColor;
     ctx.fillRect(0, 0, width, height);
 
+    const fileBuffer = fs.readFileSync(framePath);
+    if (!fileBuffer) return null;
+
     //Loads frame
-    await loadImage(framePath).then((img: Image) =>
+    await loadImage(fileBuffer).then((img: Image) =>
         ctx.drawImage(img, 0, 0, width, height),
     );
 
     //loads avatar
     if (memberAvatar) {
-        await loadImage(memberAvatar).then((img: Image) =>
+        const pngAvatar = memberAvatar.replace(/\.webp(\?.*)?$/, ".png$1");
+        await loadImage(pngAvatar).then((img: Image) =>
             ctx.drawImage(img, width / 2 - 125, 80, 250, 250),
         );
     }
 
     //writes name
-    ctx.font = "50pt Sansumu 02";
+    ctx.font = "50pt Sansumu";
     ctx.textAlign = "center";
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText(name, width / 2, 400);
 
     //writes level
-    ctx.font = "40pt Sansumu 02";
+    ctx.font = "40pt Sansumu";
     ctx.fillText(`Level: ${level}`, width / 2, 470);
 
     //renders xp bar
@@ -71,7 +77,7 @@ export const generateFrame = async (
     roundRect(ctx, 65, 500, bar, 40, 20, true, false);
 
     //writes xp amount
-    ctx.font = "40pt Sansumu 02";
+    ctx.font = "40pt Sansumu";
     ctx.fillText(`${xpPercentage}%`, width / 2, 600);
 
     //loads foreground frame if there is one

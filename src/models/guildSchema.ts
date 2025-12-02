@@ -4,16 +4,16 @@ import { toDotNotation } from "../utils/toDoNotation";
 
 const voiceChannelDataSchema = new Schema(
     {
-        voiceChannelId: { type: String },
-        infoChatId: { type: String },
+        voiceChannelId: { type: String, default: null },
+        infoChatId: { type: String, default: null },
     },
     { _id: false },
 );
 
 const ticketDataSchema = new Schema(
     {
-        ticketCategoryId: { type: String },
-        archivedTicketCategoryId: { type: String },
+        ticketCategoryId: { type: String, default: null },
+        archivedTicketCategoryId: { type: String, default: null },
     },
     { _id: false },
 );
@@ -42,9 +42,9 @@ const frameSchema = new Schema(
 
 const guildConfigSchema = new Schema({
     guildId: { type: String, required: true, unique: true },
-    voiceChannelData: { type: voiceChannelDataSchema },
-    ticketData: { type: ticketDataSchema },
-    autoModeration: { type: autoModerationSchema },
+    voiceChannelData: { type: voiceChannelDataSchema, default: () => ({}) },
+    ticketData: { type: ticketDataSchema, default: () => ({}) },
+    autoModeration: { type: autoModerationSchema, default: () => ({}) },
     topics: { type: [String] },
     noXpChannels: { type: [String], default: [] },
     frames: { type: [frameSchema], default: [] },

@@ -62,8 +62,13 @@ publicFrameRouter.get("/config", async (req: Request, res: Response) => {
     const guildConfig = await fetchGuildConfig("516605157795037185");
     if (!guildConfig)
         return res.status(500).json({ error: "No guild config found" });
+    const frames = guildConfig.frames.map((frame) => ({
+        name: frame.name,
+        id: frame.id,
+        frameLink: `https://api.sgc.se/public_api/frame/${frame.id}`,
+    }));
     const frameConfig = {
-        frames: guildConfig.frames,
+        frames: frames,
     };
     return res.json(frameConfig);
 });
@@ -81,9 +86,9 @@ publicFrameRouter.get("/:frameId", async (req: Request, res: Response) => {
         return res.status(500).json({ error: "No guild config found" });
     if (frameId > guildConfig.frames.length - 1)
         return res.status(400).json({ error: "Invalid frame ID" });
-    const frame = guildConfig.frames[frameId];
+    const frame = guildConfig.frames.find((f) => f.id === frameId);
     if (!frame) return res.status(400).json({ error: "No frame with that ID" });
-    const filePath = path.resolve("./") + frame.path;
+    const filePath = path.resolve(`./${frame.path}`);
     if (!fs.existsSync(filePath))
         return res.status(400).json({ error: "No frame with that ID" });
     res.download(filePath);

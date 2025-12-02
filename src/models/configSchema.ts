@@ -21,7 +21,7 @@ const levelSystemSchema = new Schema(
 const configSchema = new Schema({
     id: { type: String, required: true, unique: true },
     debug: { type: Boolean, default: false },
-    levelSystem: { type: levelSystemSchema },
+    levelSystem: { type: levelSystemSchema, default: () => ({}) },
     debugGuildId: { type: String },
     extraObjects: {
         type: Map,
