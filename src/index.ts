@@ -47,6 +47,9 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.listen(port, async () => {
+    if (process.env.DEBUG === "true") {
+        logger.level = "debug";
+    }
     await startMongoConnection();
     //moveData();
     logger.info(`Listening on port ${port}`);
