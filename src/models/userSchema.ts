@@ -53,7 +53,7 @@ const modLogSchema = new Schema(
         username: { type: String },
         reason: { type: String },
         timestamp: { type: Number },
-        length: { type: Number },
+        length: { type: String },
         authorId: { type: String },
     },
     { _id: false },
