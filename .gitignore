@@ -130,3 +130,6 @@ dist
 .pnp.*
 
 /cache
+\logs*
+
+oldData/

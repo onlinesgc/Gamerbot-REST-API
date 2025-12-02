@@ -1,5 +1,5 @@
 import { json, Request, Response, Router } from "express";
-import { fetchUser } from "../models/user_schema";
+import { fetchUser } from "../models/userSchema";
 
 const publicUserRouter = Router();
 publicUserRouter.use(json());
@@ -7,22 +7,25 @@ publicUserRouter.use(json());
 //GET /public_api/user/:userid
 //Returns the public user data for the given userid
 publicUserRouter.get("/:userid", async (req: Request, res: Response) => {
-  const guildData = await fetchUser(req.params["userid"]);
-  if (!guildData) {
-    return res.status(400).json({ error: "No data with that ID" });
-  }
+    if (req.params["userid"] == null)
+        return res.status(400).json({ error: "No user ID" });
 
-  const publicData = {
-    userID: guildData.userID,
-    serverID: guildData.serverID,
-    xp: guildData.xp,
-    level: guildData.level,
-    colorHexCode: guildData.colorHexCode,
-    profileFrame: guildData.profileFrame,
-    exclusiveFrames: guildData.exclusiveFrames,
-  };
+    const guildData = await fetchUser(req.params["userid"], false);
 
-  return res.json(publicData);
+    if (!guildData) {
+        return res.status(400).json({ error: "No data with that ID" });
+    }
+
+    const publicData = {
+        userID: guildData.userId,
+        xp: guildData.levelSystem!.xp,
+        level: guildData.levelSystem!.level,
+        colorHexCode: guildData.frameData!.frameColorHexCode,
+        profileFrame: guildData.frameData!.selectedFrame,
+        frames: guildData.frameData!.frames,
+    };
+
+    return res.json(publicData);
 });
 
 export { publicUserRouter };
