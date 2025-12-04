@@ -4,6 +4,9 @@ declare global {
         interface ProcessEnv {
             MONGO_URL: string;
             LOG_LEVEL: string;
+            MONGO_URL_TESTDATABASE: string;
+            PORT: string;
+            DEBUG: string;
         }
     }
 }
