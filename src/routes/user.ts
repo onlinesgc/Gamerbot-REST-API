@@ -1,5 +1,11 @@
 import { Request, Response, Router, json } from "express";
-import { fetchAllUsers, fetchUser, updateUser } from "../models/userSchema";
+import {
+    fetchAllUsers,
+    fetchAllUsersWithoutSanitized,
+    fetchUser,
+    updateUser,
+} from "../models/userSchema";
+import { formatUsersToWhitelist } from "../utils/formatUsersToWhitelist";
 
 const userRouter = Router();
 userRouter.use(json());
@@ -42,6 +48,17 @@ userRouter.post("/:userid", async (req: Request, res: Response) => {
     }
 
     res.json(userData.toJSON());
+});
+
+userRouter.get("/minecraft/data", async (req: Request, res: Response) => {
+    const users = await fetchAllUsersWithoutSanitized({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        "minecraftData.username": { $ne: null },
+    });
+
+    const minecraftUsers = await formatUsersToWhitelist(users);
+
+    res.json(minecraftUsers);
 });
 
 export { userRouter };

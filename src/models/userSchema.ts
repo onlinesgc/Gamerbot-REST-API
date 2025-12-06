@@ -157,6 +157,10 @@ export const fetchAllUsers = async (filter: object, maxUser = -1) => {
     }
 };
 
+export const fetchAllUsersWithoutSanitized = async (filter: object) => {
+    return await userModel.find(filter);
+};
+
 /**
  * Updates a user in the database.
  * Uses dot notation to ensure nested fields are updated without overwriting siblings.
