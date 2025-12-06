@@ -34,5 +34,6 @@ export async function formatUsersToWhitelist(users: UserDocument[]) {
     return minecraftUsers.map((user) => ({
         name: user.minecraftData.username!,
         uuid: user.minecraftData.uuid!,
+        discordId: user.userId,
     }));
 }
