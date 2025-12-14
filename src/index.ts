@@ -51,6 +51,5 @@ app.listen(port, async () => {
         logger.level = "debug";
     }
     await startMongoConnection();
-    //moveData();
     logger.info(`Listening on port ${port}`);
 });
