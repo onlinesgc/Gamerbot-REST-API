@@ -27,5 +27,5 @@ https://github.com/onlinesgc/Gamerbot-REST-API/wiki
 1. First clone the project `git clone https://github.com/onlinesgc/Gamerbot-REST-API.git`
 2. Go into the directory and run `npm run install`
 3. You want copy and rename the `.env.example` file to `.env`
-4. Edit the `.env` file and add the MongoDB url
+4. Edit the `.env` file and add the MongoDB url, on the MongoDB url you will need to add /test or /prod at the end of the url for MONGO_URL_TESTDATABASE or MONGO_URL, this will create both an test database and production database. By setting the DEBUG=true, you will use the test database and viceversa.
 5. Now you can run the project. You can do this by running `npm run dev`.
