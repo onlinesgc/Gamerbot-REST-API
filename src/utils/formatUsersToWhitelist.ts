@@ -25,7 +25,6 @@ export async function formatUsersToWhitelist(users: UserDocument[]) {
             await user.save();
             continue;
         }
-
         if (!user.minecraftData.uuid?.includes("-")) {
             user.minecraftData.uuid = uuidToFullUuid(user.minecraftData.uuid!);
         }

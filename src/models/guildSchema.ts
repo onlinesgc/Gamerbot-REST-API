@@ -48,6 +48,7 @@ const guildConfigSchema = new Schema({
     topics: { type: [String] },
     noXpChannels: { type: [String], default: [] },
     frames: { type: [frameSchema], default: [] },
+    hashedEmails: { type: [String], default: [] },
     extraObjects: {
         type: Map,
         of: Schema.Types.Mixed,
