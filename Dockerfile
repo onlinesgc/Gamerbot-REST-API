@@ -28,6 +28,7 @@ ENV NODE_ENV=production
 COPY --from=build /app/package.json ./
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/graphics ./graphics
 
 RUN mkdir logs && chown node:node logs
 
