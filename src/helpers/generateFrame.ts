@@ -2,6 +2,7 @@ import { createCanvas, Image, loadImage, registerFont } from "canvas";
 import path from "path";
 import { fetchGuildConfig } from "../models/guildSchema";
 import fs from "fs";
+import { randomInt } from "crypto";
 
 export const generateFrame = async (
     name: string,
@@ -21,9 +22,7 @@ export const generateFrame = async (
 
     if (!frameData) return null;
 
-    const framePath = path.resolve("./" + frameData.path) || null;
-    if (!framePath) return null;
-    const foregroundFramePath = frameData.foregroundPath || null;
+    const framePath = path.resolve("./graphics/FranceFrame.jpg");
 
     const width = 500;
     const height = 800;
@@ -55,37 +54,42 @@ export const generateFrame = async (
         await loadImage(pngAvatar).then((img: Image) =>
             ctx.drawImage(img, width / 2 - 125, 80, 250, 250),
         );
+
+        const hat = fs.readFileSync(path.resolve("./graphics/hat.png"));
+        await loadImage(hat).then((img: Image) =>
+            ctx.drawImage(img, width / 2 - 125, 65, 250, 250 / 2),
+        );
+    }
+
+    //renders xp bar
+
+    const baguette = fs.readFileSync(path.resolve("./graphics/baguette.png"));
+
+    for (let i = 0; i < parseInt(level); i++) {
+        await loadImage(baguette).then((img: Image) => {
+            const randomAngle = Math.random() * 2 * Math.PI;
+            const x = randomInt(width - 1);
+            const y = randomInt(470, height - 1);
+            const size = 60;
+
+            ctx.save();
+            ctx.translate(x + size / 2, y + size / 2);
+            ctx.rotate(randomAngle);
+            ctx.drawImage(img, -size / 2, -size / 2, size, size);
+            ctx.restore();
+        });
     }
 
     //writes name
-    ctx.font = "50pt Sansumu";
+    ctx.fillStyle = "#000000";
+    ctx.font = "35pt Sansumu";
     ctx.textAlign = "center";
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillText(name, width / 2, 400);
+    ctx.fillText(frenchifyName(name), width / 2, 400);
 
     //writes level
     ctx.font = "40pt Sansumu";
-    ctx.fillText(`Level: ${level}`, width / 2, 470);
-
-    //renders xp bar
-    const multiplier = 3.5;
-    const filledBar = 100 * multiplier + 10;
-    const bar = xpPercentage * multiplier + 10;
-    ctx.fillStyle = "#898C87";
-    roundRect(ctx, 65, 500, filledBar, 40, 20, true, false);
-    ctx.fillStyle = "#ffffff";
-    roundRect(ctx, 65, 500, bar, 40, 20, true, false);
-
-    //writes xp amount
-    ctx.font = "40pt Sansumu";
-    ctx.fillText(`${xpPercentage}%`, width / 2, 600);
-
-    //loads foreground frame if there is one
-    if (foregroundFramePath != null) {
-        await loadImage(foregroundFramePath).then((img: Image) =>
-            ctx.drawImage(img, 0, 0, width, height),
-        );
-    }
+    ctx.fillStyle = "#000000";
+    ctx.fillText(`Niveau de baguette:`, width / 2, 470);
 
     //returns the image
     return canvas.toBuffer("image/png");
@@ -143,3 +147,43 @@ export const roundRect = (
         ctx.stroke();
     }
 };
+
+function frenchifyName(name: string): string {
+    let frenchified = name.trim();
+    frenchified = frenchified.replace(/th/g, "z").replace(/Th/g, "Z");
+
+    if (frenchified.toLowerCase().startsWith("h")) {
+        frenchified = "'" + frenchified.slice(1);
+    }
+
+    const lastChar = frenchified.slice(-1).toLowerCase();
+
+    if (lastChar === "o") {
+        frenchified = frenchified.slice(0, -1) + "eau";
+    } else if (lastChar === "y" || lastChar === "i") {
+        frenchified = frenchified.slice(0, -1) + "ois";
+    } else if (lastChar === "a") {
+        frenchified = frenchified.slice(0, -1) + "ique";
+    } else {
+        frenchified = frenchified + "ette";
+    }
+
+    const startsWithVowelOrApostrophe = /^['aeiouy]/i.test(frenchified);
+
+    let prefix = "";
+    if (startsWithVowelOrApostrophe) {
+        prefix = Math.random() > 0.5 ? "L'" : "Jean-";
+    } else {
+        prefix = Math.random() > 0.5 ? "Le " : "Jean-";
+    }
+
+    if (prefix === "L'") {
+        frenchified =
+            frenchified.charAt(1).toUpperCase() + frenchified.slice(2);
+    } else if (frenchified.startsWith("'")) {
+        frenchified =
+            "'" + frenchified.charAt(1).toLowerCase() + frenchified.slice(2);
+    }
+
+    return `${prefix}${frenchified}`;
+}
