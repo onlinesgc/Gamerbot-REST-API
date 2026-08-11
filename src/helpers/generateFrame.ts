@@ -1,3 +1,4 @@
+process.env.FONTCONFIG_PATH = "/dev/null";
 import { createCanvas, Image, loadImage, registerFont } from "canvas";
 import path from "path";
 import { fetchGuildConfig } from "../models/guildSchema";
@@ -41,30 +42,28 @@ export const generateFrame = async (
     ctx.fillStyle = hexColor;
     ctx.fillRect(0, 0, width, height);
 
-    const fileBuffer = fs.readFileSync(framePath);
-    if (!fileBuffer) return null;
-
-    //Loads frame
-    await loadImage(fileBuffer).then((img: Image) =>
-        ctx.drawImage(img, 0, 0, width, height),
-    );
+    const bgImg = await safeLoadImage(framePath);
+    if (bgImg) ctx.drawImage(bgImg, 0, 0, width, height);
 
     //loads avatar
     if (memberAvatar) {
         const pngAvatar = memberAvatar.replace(/\.webp(\?.*)?$/, ".png$1");
-        await loadImage(pngAvatar).then((img: Image) =>
-            ctx.drawImage(img, width / 2 - 125, 80, 250, 250),
-        );
+        const avatarImg = await safeLoadImage(pngAvatar);
+        if (avatarImg) {
+            ctx.drawImage(avatarImg, width / 2 - 125, 80, 250, 250);
+        }
     }
 
+    const fallbackFont = '"Sansumu", "Arial"';
+
     //writes name
-    ctx.font = "50pt Sansumu";
+    ctx.font = `50pt ${fallbackFont}`;
     ctx.textAlign = "center";
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText(name, width / 2, 400);
 
     //writes level
-    ctx.font = "40pt Sansumu";
+    ctx.font = `40pt ${fallbackFont}`;
     ctx.fillText(`Level: ${level}`, width / 2, 470);
 
     //renders xp bar
@@ -77,14 +76,13 @@ export const generateFrame = async (
     roundRect(ctx, 65, 500, bar, 40, 20, true, false);
 
     //writes xp amount
-    ctx.font = "40pt Sansumu";
+    ctx.font = `40pt ${fallbackFont}`;
     ctx.fillText(`${xpPercentage}%`, width / 2, 600);
 
     //loads foreground frame if there is one
     if (foregroundFramePath != null) {
-        await loadImage(foregroundFramePath).then((img: Image) =>
-            ctx.drawImage(img, 0, 0, width, height),
-        );
+        const fgImg = await safeLoadImage(foregroundFramePath);
+        if (fgImg) ctx.drawImage(fgImg, 0, 0, width, height);
     }
 
     //returns the image
@@ -141,5 +139,28 @@ export const roundRect = (
     }
     if (stroke) {
         ctx.stroke();
+    }
+};
+
+const safeLoadImage = async (source: string): Promise<Image | null> => {
+    try {
+        // If it's a URL (Avatar or hosted frame)
+        if (source.startsWith("http://") || source.startsWith("https://")) {
+            const response = await fetch(source);
+            if (!response.ok) return null;
+            const arrayBuffer = await response.arrayBuffer();
+            return await loadImage(Buffer.from(arrayBuffer));
+        }
+
+        // If it's a local file path
+        if (fs.existsSync(source)) {
+            const fileBuffer = fs.readFileSync(source);
+            return await loadImage(fileBuffer);
+        }
+
+        return null;
+    } catch (error) {
+        console.error(`Failed to load image from ${source}:`, error);
+        return null;
     }
 };
